@@ -1,0 +1,78 @@
+<div class="wrapper">
+    <aside id="sidebar">
+        <div class="d-flex">
+            <button class="toggle-btn" type="button" (click)="toggleSidebar()">
+                <img src="assets/images/logo_empresa.png" alt="Logo" class="toggle-img" />
+            </button>
+            <div class="sidebar-logo">
+                <a>INTRANET</a>
+            </div>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a routerLink="dashboard" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-users-gear"></i>
+                    <span>DASHBOARD</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a routerLink="mis-datos" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-user"></i>
+                    <span>MIS DATOS</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a routerLink="usuarios-roles" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-users-line"></i>
+                    <span>USUARIOS</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a routerLink="asistencia" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-users-line"></i>
+                    <span>ASISTENCIA</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a routerLink="jornada-horarios" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-users-line"></i>
+                    <span>JORNADAS Y HORARIOS</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a routerLink="planillas" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-users-gear"></i>
+                    <span>PLANILLAS</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a routerLink="pagos-adelantos" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-users-gear"></i>
+                    <span>PAGOS Y ADELANTOS</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a routerLink="analisis-predictivo" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-table-list"></i>
+                    <span>ANALISIS PREDICTIVO</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a routerLink="reportes" class="sidebar-link" routerLinkActive="active">
+                    <i class="fa fa-table-list"></i>
+                    <span>REPORTES</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+        <a (click)="logout()" class="sidebar-link" style="cursor: pointer;">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Logout</span>
+        </a>
+        </div>
+
+    </aside>
+    <div class="main">
+        <router-outlet></router-outlet>
+    </div>
+</div>
