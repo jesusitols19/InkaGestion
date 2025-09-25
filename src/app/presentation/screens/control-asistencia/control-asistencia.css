@@ -1,0 +1,9 @@
+.tituloI {
+  font-family: 'Acme', sans-serif;  
+  padding: 10px 20px;
+  color: var(--primary-main);
+  background-color: var(--primary-color);
+  border-radius: 20px;
+  text-align: center;
+  font-size: 20px;
+}
