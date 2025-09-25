@@ -1,41 +1,44 @@
-/* You can add global styles to this file, and also import other style files */
+/* 🌱 Paleta de colores para intranet agropecuaria */
 
-/* :root {
-    --primary-color: #F7812A;
-    --primary-color-hover: #dd7225;
-    --primary-main:#fafbfe;
-    --visible-background: rgba(255, 255, 255, 0.15);
-    --cancel-color: #ccc;
-    --cancel-color-hover: #999;
-} */
-
+/* 🎨 Variables globales */
 :root {
-    /* 🎨 Colores principales del logo */
-    --primary-color: #E2241A;          /* Rojo Inka (texto principal) */
-    --primary-color-hover: #C41E15;    /* Rojo más oscuro para hover */
-    --secondary-color: #F9B715;        /* Amarillo (mango/detalles) */
-    --secondary-color-hover: #D99E10;  /* Amarillo más oscuro */
-    --accent-color: #4A8C37;           /* Verde hoja/palta */
-    --accent-color-hover: #3A6F2B;     /* Verde oscuro */
-    
-    /* ⚙️ Fondos y neutrales */
-    --primary-main: #FAFBFE;           /* Fondo principal claro */
+    /* Colores principales */
+    --primary-color: #0f9980;          /* Verde principal (pigment green) */
+    --primary-color-hover: #2E7D32;    /* Verde oscuro (office green) */
+    --secondary-color: #FBC02D;        /* Amarillo (acento/energía) */
+    --secondary-color-hover: #DFAF1F;  /* Amarillo más oscuro */
+
+    /* ⚙️ Neutrales */
+    --primary-main: #FAFBFE;           /* Fondo claro principal */
     --visible-background: rgba(255, 255, 255, 0.15);
     --cancel-color: #CCCCCC;           /* Gris neutro */
-    --cancel-color-hover: #999999;
+    --cancel-color-hover: #999999;     /* Gris hover */
+    --dark-color: #212121;             /* Negro suave (texto/títulos) */
+    --white: #FFFFFF;                  /* Blanco */
 
-    /* Extras (por si quieres usar) */
-    --warning-color: #F26B1D;          /* Naranja intermedio (mango) */
-    --dark-color: #2D4025;             /* Verde muy oscuro (palta cáscara) */
+    /* Extras */
+    --accent-color: #4CAF50;           /* Verde igual a primary (consistencia) */
+    --accent-color-hover: #2E7D32;     /* Hover verde */
+    --warning-color: #F9A825;          /* Naranja/amarillo intermedio */
+    --amber: #FFC107;                  /* Ámbar */
+
+    --green-dark: #002f25;             /* Verde oscuro */
 }
 
+/* 🏷️ Ejemplo de título */
 .tituloI {
     font-family: 'Acme', sans-serif;  
-    padding: 10px 20px;
-    color: var(--primary-main);
-    background-color: var(--primary-color);
-    border-radius: 20px;
+    padding: 12px 24px;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 16px;
     text-align: center;
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: background 0.3s ease;
 }
 
+.tituloI:hover {
+    background: linear-gradient(135deg, var(--primary-color-hover), var(--secondary-color-hover));
+}
