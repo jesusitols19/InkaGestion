@@ -1,1 +1,11 @@
-<p>jornadas-horarios works!</p>
+<app-reusable-table
+      [data]="empleados"
+      [columns]="columnas"
+      [title]="'Lista de Empleados'"
+      [autoFilters]="['area', 'cargo']"
+      [customFilters]="filtrosPersonalizados"
+      [config]="configuracionTabla"
+      (onRowSelect)="onEmpleadoSeleccionado($event)"
+      (onExport)="onExportarDatos($event)"
+      (onFiltersChange)="onFiltrosCambiados($event)">
+</app-reusable-table>

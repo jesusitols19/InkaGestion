@@ -1,0 +1,393 @@
+
+<div class="smart-table-container">
+  
+  <!-- Header con título y controles -->
+  @if (title || config.exportEnabled || config.advancedFilters) {
+    <div class="table-header">
+      <div class="header-left">
+        @if (title) {
+          <h3 class="table-title">
+            <i class="pi pi-table"></i>
+            {{ title }}
+          </h3>
+        }
+        @if (totalRecords > 0) {
+          <span class="record-count">
+            {{ totalRecords }} registros
+          </span>
+        }
+      </div>
+      
+      <div class="header-actions">
+        <!-- Botón de filtros avanzados -->
+        @if (config.advancedFilters) {
+          <p-button 
+            [label]="showAdvancedFilters() ? 'Ocultar Filtros' : 'Filtros Avanzados'"
+            [icon]="showAdvancedFilters() ? 'pi pi-eye-slash' : 'pi pi-filter'"
+            variant="outlined"
+            severity="secondary"
+            (onClick)="toggleAdvancedFilters()"
+            [badge]="isFilterActive() ? Object.keys(activeFilters).length.toString() : undefined"
+            badgeClass="p-badge-info">
+          </p-button>
+        }
+        
+        <!-- Botón de limpiar filtros -->
+        @if (isFilterActive()) {
+          <p-button 
+            label="Limpiar Filtros"
+            icon="pi pi-times"
+            variant="outlined"
+            severity="warn"
+            (onClick)="clearFilters()">
+          </p-button>
+        }
+        
+        <!-- Menú de exportación -->
+        @if (config.exportEnabled) {
+          <div class="export-menu">
+            <p-button 
+              #exportBtn
+              label="Exportar"
+              icon="pi pi-download"
+              variant="outlined"
+              severity="success"
+              (onClick)="exportPanel.toggle($event)">
+            </p-button>
+            
+            <p-popover #exportPanel>
+              <div class="export-options">
+                <h4>Seleccionar formato</h4>
+                <div class="export-buttons">
+                  @for (option of exportOptions; track option.value) {
+                    <p-button 
+                      [label]="option.label"
+                      [icon]="option.icon"
+                      variant="text"
+                      size="small"
+                      class="export-option"
+                      (onClick)="exportData(option.value); exportPanel.hide()">
+                    </p-button>
+                  }
+                </div>
+              </div>
+            </p-popover>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Panel de filtros avanzados -->
+  @if (showAdvancedFilters()) {
+    <div class="advanced-filters-panel">
+      <p-card>
+        <div class="filters-grid">
+          
+          <!-- Filtros automáticos generados -->
+          @for (field of autoFilters; track field) {
+            <div class="filter-item">
+              <label [for]="'filter-' + field">{{ formatHeader(field) }}</label>
+              <p-select
+                [inputId]="'filter-' + field"
+                [options]="getFilterOptions(field)"
+                [(ngModel)]="activeFilters()[field]"
+                [placeholder]="'Seleccionar ' + formatHeader(field).toLowerCase()"
+                [showClear]="true"
+                optionLabel="label"
+                optionValue="value"
+                (onChange)="applyColumnFilter(field, $event.value)">
+              </p-select>
+            </div>
+          }
+
+
+
+          <!-- Filtros personalizados -->
+          @for (filter of customFilters; track filter.field) {
+            <div class="filter-item">
+              <label [for]="'custom-filter-' + filter.field">
+                {{ filter.label || formatHeader(filter.field) }}
+              </label>
+              
+              <!-- Select simple -->
+              @if (filter.type === 'dropdown') {
+                <p-select
+                  [inputId]="'custom-filter-' + filter.field"
+                  [options]="filter.options"
+                  [(ngModel)]="activeFilters()[filter.field]"
+                  [placeholder]="filter.placeholder || 'Seleccionar...'"
+                  [showClear]="true"
+                  optionLabel="label"
+                  optionValue="value"
+                  (click)="$event.stopPropagation()"
+                  (onChange)="applyColumnFilter(filter.field, $event.value)">
+                </p-select>
+              }
+
+              <!-- MultiSelect -->
+              @if (filter.type === 'multiselect') {
+                <p-multiselect
+                  [inputId]="'custom-filter-' + filter.field"
+                  [options]="filter.options"
+                  [(ngModel)]="activeFilters()[filter.field]"
+                  [placeholder]="filter.placeholder || 'Seleccionar múltiples...'"
+                  optionLabel="label"
+                  optionValue="value"
+                  [showClear]="true"
+                  (onChange)="applyMultiSelectFilter(filter.field, $event.value)">
+                </p-multiselect>
+              }
+
+              <!-- Filtro de fecha -->
+              @if (filter.type === 'date') {
+                <p-datepicker
+                  [inputId]="'custom-filter-' + filter.field"
+                  [(ngModel)]="activeFilters()[filter.field]"
+                  [placeholder]="filter.placeholder || 'Seleccionar fecha...'"
+                  [showIcon]="true"
+                  dateFormat="dd/mm/yy"
+                  [showClear]="true"
+                  (onSelect)="applyColumnFilter(filter.field, $event)">
+                </p-datepicker>
+              }
+
+              <!-- Filtro de texto -->
+              @if (filter.type === 'text') {
+                <!-- Reemplaza tu input existente por esto -->
+                <p-floatlabel>
+                  <label for="custom-filter">First name:</label>
+                  <input
+                    type="text"
+                    pInputText
+                    id="custom-filter"
+                    [formControl]="filterControls[filter.field]"
+                    [attr.aria-label]="filter.placeholder || 'Buscar...'"
+                    [placeholder]="filter.placeholder || 'Buscar...'"
+                    [title]="filter.placeholder || 'Buscar...'"
+                    (input)="applyColumnFilter(filter.field, $any($event.target).value, 'contains')">
+                  <label [for]="'custom-filter-' + filter.field">{{ filter.label || filter.placeholder || 'Buscar...' }}</label>
+                </p-floatlabel>
+              }
+
+              <!-- Filtro numérico -->
+              @if (filter.type === 'number') {
+                <p-inputnumber
+                  [inputId]="'custom-filter-' + filter.field"
+                  [(ngModel)]="activeFilters()[filter.field]"
+                  [placeholder]="filter.placeholder || 'Número...'"
+                  (onInput)="applyColumnFilter(filter.field, $event.value, 'equals')">
+                </p-inputnumber>
+              }
+            </div>
+          }
+        </div>
+      </p-card>
+    </div>
+  }
+
+  <!-- Tabla principal -->
+  <p-card class="table-card">
+    <p-table
+      #dt
+      [value]="data"
+      [columns]="columns"
+      [paginator]="paginator"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      [loading]="loading()"
+      [lazy]="lazy"
+      [rowHover]="true"
+      [scrollable]="true"
+      scrollHeight="flex"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+      selectionMode="single"
+      [(selection)]="selectedRows"
+      (onLazyLoad)="onLazyLoadHandler($event)"
+      (onRowSelect)="onRowSelectHandler($event)"
+      (onRowUnselect)="onRowUnselectHandler($event)"
+      styleClass="p-datatable-sm p-datatable-striped p-datatable-hover">
+
+      <!-- Caption con búsqueda global -->
+      @if (config.globalSearch) {
+        <ng-template pTemplate="caption">
+          <div class="table-caption">
+            <div class="global-search">
+              <p-iconfield iconPosition="left">
+                <p-inputicon styleClass="pi pi-search"></p-inputicon>
+                <input 
+                  pInputText 
+                  type="text" 
+                  [value]="globalFilter()"
+                  (input)="applyGlobalFilter($event)"
+                  (click)="$event.stopPropagation()"
+                  placeholder="Buscar en todos los campos..."
+                  class="global-search-input">
+              </p-iconfield>
+            </div>
+            
+            @if (hasSelection() && selectedRows.length > 0) {
+              <div class="selection-info">
+                <span class="selected-count">
+                  {{ selectedRows().length }} elemento(s) seleccionado(s)
+                </span>
+              </div>
+            }
+          </div>
+        </ng-template>
+      }
+
+      <!-- Header de la tabla -->
+      <ng-template pTemplate="header">
+        <tr>
+
+          
+          <!-- Columnas dinámicas -->
+          @for (col of columns; track col.field) {
+          <th 
+            [pSortableColumn]="col.sortable !== false ? col.field : undefined"
+            [style.width]="col.width"
+            [attr.pFrozenColumn]="col.frozen ? '' : null">
+              
+              <div class="column-header">
+                <span>{{ col.header }}</span>
+                @if (col.sortable !== false) {
+                  <p-sortIcon [field]="col.field"></p-sortIcon>
+                }
+              </div>
+              
+              <!-- Filtros por columna -->
+              @if (config.columnFilters && col.filterable !== false) {
+                <div class="column-filter">
+                  
+
+                  
+                  <!-- Filtro dropdown automático -->
+                  @if (hasAutoFilter(col.field)) {
+                    <p-select
+                      [options]="getFilterOptions(col.field)"
+                      [placeholder]="'Todos'"
+                      [showClear]="true"
+                      optionLabel="label"
+                      optionValue="value"
+                      class="column-filter-dropdown"
+                      (click)="$event.stopPropagation()"
+                      (onChange)="dt.filter($event.value, col.field, 'equals')">
+                    </p-select>
+                  }
+                  
+                  <!-- Filtro de fecha -->
+                  @if (col.type === 'date') {
+                    <p-datepicker
+                      [placeholder]="'Fecha'"
+                      [showIcon]="true"
+                      [showClear]="true"
+                      dateFormat="dd/mm/yy"
+                      class="column-filter-date"
+                      (onSelect)="dt.filter($event, col.field, 'dateIs')">
+                    </p-datepicker>
+                  }
+                </div>
+              }
+            </th>
+          }
+        </tr>
+      </ng-template>
+
+      <!-- Body de la tabla -->
+      <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="rowData" [pSelectableRowIndex]="rowIndex">
+          
+
+      
+          <!-- Datos de las columnas -->
+          @for (col of columns; track col.field) {
+            <td pFrozenColumn>
+              
+              <!-- Texto normal -->
+              @if (col.type !== 'date' && col.type !== 'number' && col.type !== 'boolean') {
+                <span>{{ rowData[col.field] }}</span>
+              }
+              
+              <!-- Fecha formateada -->
+              @if (col.type === 'date') {
+                <span>{{ rowData[col.field] | date:(col.format || 'dd/MM/yyyy') }}</span>
+              }
+              
+              <!-- Número formateado -->
+              @if (col.type === 'number') {
+                <span>{{ rowData[col.field] | number:(col.format || '1.0-2') }}</span>
+              }
+              
+              <!-- Boolean como badge -->
+              @if (col.type === 'boolean') {
+                <p-badge 
+                  [value]="rowData[col.field] ? 'Sí' : 'No'"
+                  [severity]="rowData[col.field] ? 'success' : 'danger'">
+                </p-badge>
+              }
+            </td>
+          }
+        </tr>
+      </ng-template>
+
+
+      <!-- Mensaje cuando no hay datos -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="columns.length + (hasSelection() ? 1 : 0)" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-inbox empty-icon"></i>
+              <h4>No se encontraron datos</h4>
+              <p>No hay registros que coincidan con los filtros aplicados.</p>
+              @if (isFilterActive()) {
+                <p-button 
+                  label="Limpiar filtros"
+                  icon="pi pi-times"
+                  variant="outlined"
+                  size="small"
+                  (onClick)="clearFilters()">
+                </p-button>
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Loading template -->
+      <ng-template pTemplate="loadingbody">
+        <tr>
+          <td [attr.colspan]="columns.length + (hasSelection() ? 1 : 0)" class="text-center">
+            <div class="loading-state">
+              <i class="pi pi-spinner pi-spin loading-icon"></i>
+              <p>Cargando datos...</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Footer con información adicional -->
+  @if (selectedRows.length > 0 || isFilterActive()) {
+    <div class="table-footer">
+      <div class="footer-info">
+        @if (selectedRows.length > 0) {
+          <span class="selection-summary">
+            <i class="pi pi-check-circle"></i>
+            {{ selectedRows().length }} de {{ totalRecords }} seleccionado(s)
+          </span>
+        }
+        
+        @if (isFilterActive()) {
+          <span class="filter-summary">
+            <i class="pi pi-filter"></i>
+            Filtros activos: {{ Object.keys(activeFilters).length }}
+          </span>
+        }
+      </div>
+    </div>
+  }
+</div>
