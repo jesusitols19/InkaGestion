@@ -9,47 +9,67 @@ import { AdministracionPlanilla } from './presentation/screens/administracion-pl
 import { PagosAdelantos } from './presentation/screens/pagos-adelantos/pagos-adelantos';
 import { AnalisisPredictivo } from './presentation/screens/analisis-predictivo/analisis-predictivo';
 import { ReportesAdministrativos } from './presentation/screens/reportes-administrativos/reportes-administrativos';
+import { LoginComponent } from './presentation/screens/login/login.component';
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
+    {
+        path:'login',
+        component:LoginComponent
+    },
+    {
+        path:'',
+        redirectTo:'login',
+        pathMatch:'full'
+    },
     {
         path: '',
         component: Sidebar,
         children: [
             {
                 path: 'dashboard',
-                component: Dashboard
+                component: Dashboard,
+                canActivate: [authGuard]
             },
             {
                 path: 'mis-datos',
-                component: MisDatos
+                component: MisDatos,
+                canActivate: [authGuard]
             },
             {
                 path: 'usuarios-roles',
-                component: UsuariosRoles
+                component: UsuariosRoles,
+                canActivate: [authGuard]
             },
             {
                 path: 'asistencia',
-                component: ControlAsistencia
+                component: ControlAsistencia,
+                canActivate: [authGuard]
             },
             {
                 path: 'jornada-horarios',
-                component: JornadasHorarios
+                component: JornadasHorarios,
+                canActivate: [authGuard]
             },
             {
                 path: 'planillas',
-                component: AdministracionPlanilla
+                component: AdministracionPlanilla,
+                canActivate: [authGuard]
             },
             {
                 path: 'pagos-adelantos',
-                component: PagosAdelantos
+                component: PagosAdelantos,
+                canActivate: [authGuard]
             },
             {
                 path: 'analisis-predictivo',
-                component: AnalisisPredictivo
+                component: AnalisisPredictivo,
+                canActivate: [authGuard]
             },
             {
                 path: 'reportes',
-                component: ReportesAdministrativos
+                component: ReportesAdministrativos,
+                canActivate: [authGuard]
             },
         ]
     }

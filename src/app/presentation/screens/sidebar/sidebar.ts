@@ -19,6 +19,9 @@ export class Sidebar {
   
   logout(): void {
     console.log('👋 Cierre de sesión');
+    localStorage.removeItem("id_usuario_actual");
+    localStorage.removeItem("nombre_usuario_actual");
+    localStorage.removeItem("correo_usuario_actual");
     this.router.navigateByUrl('/login');
   }
 }
