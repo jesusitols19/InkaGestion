@@ -1,9 +1,27 @@
-<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-  <label>Nombre:</label>
-  <input type="text" formControlName="nombre" />
+<div class="container mt-5 d-flex justify-content-center">
+  <div class="card shadow-lg border-0 rounded-4" style="max-width: 500px; width: 100%;">
+    <div class="card-header text-center rounded-top-4" style="color:black">
+      <h4 class="mb-0">Mi Usuario</h4>
+    </div>
+    <div class="card-body p-4">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        
+        <div class="mb-3">
+          <label class="form-label">Nombre:</label>
+          <input type="text" class="form-control" formControlName="nombre" placeholder="Ingrese el nombre" />
+        </div>
 
-  <label>Correo:</label>
-  <input type="email" formControlName="correo" />
+        <div class="mb-3">
+          <label class="form-label">Correo:</label>
+          <input type="email" class="form-control" formControlName="correo" placeholder="ejemplo@correo.com" />
+        </div>
 
-  <button type="submit" [disabled]="userForm.invalid">EDITAR</button>
-</form>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-success btn-lg" [disabled]="userForm.invalid">
+            <i class="bi bi-check-circle"></i> Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
