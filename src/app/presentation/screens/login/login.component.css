@@ -1,3 +1,194 @@
-:host {
+
+/* ===========================
+   🌿 Contenedor principal
+=========================== */
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-color);
+  transition: background 0.4s ease;
+  padding: 20px;
+}
+
+/* ===========================
+   💎 Tarjeta de Login
+=========================== */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 32px;
+  border-radius: 24px;
+  color: var(--text-color);
+  box-shadow: 0 10px 30px var(--shadow);
+  border: 1px solid var(--border-color);
+
+  -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+  animation: fadeIn 0.8s ease;
+}
+
+/* ✨ Efecto cristal */
+.glass-effect {
+  background: var(--card-bg);
+}
+
+/* ===========================
+   🏷️ Logo & Títulos
+=========================== */
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.logo img {
+  width: 60px;
+  height: 60px;
+}
+
+.titulo {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitulo {
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 28px;
+}
+
+/* ===========================
+   📋 Formulario
+=========================== */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 🔤 Labels */
+.form-group label {
   display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ✏️ Inputs */
+.form-group input,
+p-password ::ng-deep input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  transition: 0.3s ease;
+}
+
+.form-group input:focus,
+p-password ::ng-deep input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 153, 128, 0.25);
+}
+
+/* 🔘 Extras */
+.extras {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.extras a {
+  text-decoration: none;
+  color: var(--primary);
+}
+
+.extras label {
+  cursor: pointer;
+}
+
+/* 🚀 Botón */
+.btn-primary {
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--text-color) ;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+/* 🌙 Toggle de tema */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+}
+
+.theme-toggle button {
+  background-color: var(--card-bg);
+  color: var(--primary-color);
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px var(--shadow);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle button {
+  background-color: rgba(255, 255, 255, 0.2); /* fallback */
+  -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.theme-toggle button:hover {
+  transform: scale(1.1);
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+
+
+
+/* 📱 Responsive */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 20px;
+  }
+}
+
+/* ✨ Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

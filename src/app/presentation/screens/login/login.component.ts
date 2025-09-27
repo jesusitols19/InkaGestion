@@ -4,16 +4,19 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environments';
 import { CommonModule } from '@angular/common';
+import { PasswordModule } from 'primeng/password';
+
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule,HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule,HttpClientModule, PasswordModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent { 
 
   loginForm: FormGroup;
+  isDarkMode = false;
 
   constructor(
     private fb: FormBuilder,
@@ -26,6 +29,16 @@ export class LoginComponent {
     });
   }
 
+toggleTheme() {
+  this.isDarkMode = !this.isDarkMode;
+
+  const body = document.body;
+  if (this.isDarkMode) {
+    body.classList.add('dark-theme');
+  } else {
+    body.classList.remove('dark-theme');
+  }
+}
 
   onSubmit() {
     if (this.loginForm.valid) {
