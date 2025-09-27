@@ -1,1 +1,9 @@
-<p>mis-datos works!</p>
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+  <label>Nombre:</label>
+  <input type="text" formControlName="nombre" />
+
+  <label>Correo:</label>
+  <input type="email" formControlName="correo" />
+
+  <button type="submit" [disabled]="userForm.invalid">EDITAR</button>
+</form>

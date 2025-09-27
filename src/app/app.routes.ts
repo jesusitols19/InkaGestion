@@ -3,7 +3,7 @@ import { Sidebar } from './presentation/screens/sidebar/sidebar';
 import { Dashboard } from './presentation/screens/dashboard/dashboard';
 import { MisDatos } from './presentation/screens/mis-datos/mis-datos';
 import { UsuariosRoles } from './presentation/screens/usuarios-roles/usuarios-roles';
-import { ControlAsistencia } from './presentation/screens/control-asistencia/control-asistencia';
+import { ControlAsistencia } from './presentation/screens/trabajadores-asistencia/gestion-asistencia/control-asistencia';
 import { JornadasHorarios } from './presentation/screens/jornadas-horarios/jornadas-horarios';
 import { AdministracionPlanilla } from './presentation/screens/administracion-planilla/administracion-planilla';
 import { PagosAdelantos } from './presentation/screens/pagos-adelantos/pagos-adelantos';
@@ -11,6 +11,7 @@ import { AnalisisPredictivo } from './presentation/screens/analisis-predictivo/a
 import { ReportesAdministrativos } from './presentation/screens/reportes-administrativos/reportes-administrativos';
 import { LoginComponent } from './presentation/screens/login/login.component';
 import { authGuard } from './guards/auth-guard';
+import { TrabajadoresComponent } from './presentation/screens/trabajadores-asistencia/trabajadores/trabajadores/trabajadores.component';
 
 export const routes: Routes = [
     {
@@ -42,7 +43,12 @@ export const routes: Routes = [
                 canActivate: [authGuard]
             },
             {
-                path: 'asistencia',
+                path: 'trabajadores',
+                component: TrabajadoresComponent,
+                canActivate: [authGuard]
+            },
+            {
+                path: 'trabajadores/control-asistencia',
                 component: ControlAsistencia,
                 canActivate: [authGuard]
             },
