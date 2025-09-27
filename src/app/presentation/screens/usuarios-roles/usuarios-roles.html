@@ -1,1 +1,59 @@
-<p>usuarios-roles works!</p>
+<h2>Gestión de Usuarios</h2>
+
+<!-- Formulario -->
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+  <label>Nombre:</label>
+  <input type="text" formControlName="nombre" />
+
+  <label>Correo:</label>
+  <input type="email" formControlName="correo" />
+
+  <label>Password:</label>
+  <input type="password" formControlName="password" />
+
+  <!-- <label>Rol:</label>
+  <select formControlName="role_id">
+    <option value="1">Admin</option>
+    <option value="2">Supervisor</option>
+    <option value="3">Empleado</option>
+  </select> -->
+
+  <button type="submit">
+    {{ editingUserId ? 'Actualizar' : 'Guardar' }}
+  </button>
+
+  @if(editingUserId){
+    <button type="button" (click)="resetForm()">Cancelar</button>
+  }
+</form>
+
+<hr />
+
+<!-- Tabla de usuarios -->
+<table border="1" width="100%">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Correo</th>
+      <th>Rol</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for(usuario of usuarios; track usuario.id){
+        <tr>
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.correo }}</td>
+            @if(usuario.role_id === 2){
+                <td>Supervisor</td>
+            }
+            <!-- <td>{{ usuario.role_id }}</td> -->
+            <td>
+                <button (click)="editarUsuario(usuario)">Editar</button>
+            </td>
+        </tr>
+    }
+  </tbody>
+</table>
