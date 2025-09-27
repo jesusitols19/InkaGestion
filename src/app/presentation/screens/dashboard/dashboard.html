@@ -1,6 +1,326 @@
-<p>dashboard works!</p>
-<h1>Dashboard</h1>
-<p>Bienvenido al panel de control.</p>
-<p>Desde aquí puedes acceder a las diferentes secciones de la aplicación.</p>
-    <a routerLink="reportes" class="sidebar-link" routerLinkActive="active">Ir a Reportes</a>
-    <p>Este es el dashboard V.2</p>
+<!-- dashboard.component.html - Angular 19 -->
+
+<!-- Header del Dashboard -->
+<div class="dashboard-header">
+
+</div>
+
+<!-- Estadísticas Principales -->
+<div class="stats-grid">
+  <!-- Total Empleados -->
+  <div [class]="'stat-card primary'">
+    <div class="stat-icon">
+      <i class="fas fa-users"></i>
+    </div>
+    <div class="stat-content">
+      <h3>{{ stats().totalEmpleados }}</h3>
+      <p>Total Empleados</p>
+      <span class="stat-subtitle">Personal registrado</span>
+    </div>
+  </div>
+
+  <!-- Asistencia Hoy -->
+  <div [class]="'stat-card success'">
+    <div class="stat-icon">
+      <i class="fas fa-user-check"></i>
+    </div>
+    <div class="stat-content">
+      <h3>{{ stats().asistenciaHoy }}/{{ stats().totalEmpleados }}</h3>
+      <p>Asistencia Hoy</p>
+      <span class="stat-subtitle">{{ stats().asistenciaPorcentaje | number:'1.1-1' }}% presente</span>
+    </div>
+    <div [class]="'stat-trend positive'">
+      <i class="fas fa-arrow-up"></i>
+      +2.3%
+    </div>
+  </div>
+
+  <!-- Ingresos del Mes -->
+  <div [class]="'stat-card secondary'">
+    <div class="stat-icon">
+      <i class="fas fa-dollar-sign"></i>
+    </div>
+    <div class="stat-content">
+      <h3>S/ {{ stats().ingresosMes | currency:'PEN':'symbol':'1.2-2' }}</h3>
+      <p>Ingresos Marzo</p>
+      <span class="stat-subtitle">Ventas del mes</span>
+    </div>
+    <div [class]="'stat-trend positive'">
+      <i class="fas fa-arrow-up"></i>
+      +8.1%
+    </div>
+  </div>
+
+  <!-- Pagos Pendientes -->
+  <div [class]="'stat-card warning'">
+    <div class="stat-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <div class="stat-content">
+      <h3>{{ stats().pagosPendientes }}</h3>
+      <p>Pagos Pendientes</p>
+      <span class="stat-subtitle">Requieren atención</span>
+    </div>
+  </div>
+</div>
+
+<!-- Contenido Principal -->
+<div class="dashboard-content">
+  <!-- Columna Izquierda -->
+  <div class="left-column">
+    
+    <!-- Gráfico Semanal -->
+    <div class="card chart-card">
+      <div class="card-header">
+        <h3>
+          <i class="fas fa-chart-bar"></i>
+          Asistencia Semanal
+        </h3>
+        <div class="chart-legend">
+          <span class="legend-item present">
+            <div class="legend-color"></div>
+            Presente
+          </span>
+          <span class="legend-item absent">
+            <div class="legend-color"></div>
+            Ausente
+          </span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="weekly-chart">
+          @for (dia of datosSemanales(); track dia.dia) {
+            <div class="chart-bar">
+              <div class="bar-container">
+                <div 
+                  class="bar-fill" 
+                  [style.height.%]="dia.porcentaje"
+                  [attr.title]="'Asistencia: ' + dia.porcentaje + '%'"
+                  [attr.aria-label]="'Día ' + dia.dia + ': ' + dia.porcentaje + '% de asistencia'">
+                </div>
+              </div>
+              <span class="day-label">{{ dia.dia }}</span>
+              <small class="percentage">{{ dia.porcentaje }}%</small>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal de Campo -->
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          <i class="fas fa-map-marker-alt"></i>
+          Personal de Campo - Estado Actual
+        </h3>
+        <span [class]="'badge success'">{{ empleadosActivos() }} activos</span>
+      </div>
+      <div class="field-workers">
+        @for (trabajador of personalCampo(); track trabajador.id) {
+          <div 
+            [class]="{
+              'worker-card': true,
+              'active': trabajador.estado === 'activo',
+              'rest': trabajador.estado === 'descanso'
+            }"
+            (click)="verDetalleEmpleado(trabajador)"
+            [attr.role]="'button'"
+            [attr.tabindex]="0"
+            [attr.aria-label]="'Ver detalles de ' + trabajador.nombre">
+            
+            <div class="worker-info">
+              <div class="worker-header">
+                <h4>{{ trabajador.nombre }}</h4>
+                <span 
+                  [class]="'status-badge ' + trabajador.estado"
+                  [attr.aria-label]="'Estado: ' + trabajador.estado">
+                  {{ trabajador.estado === 'activo' ? 'Activo' : 'Descanso' }}
+                </span>
+              </div>
+              
+              <div class="worker-details">
+                <p class="sector">
+                  <i class="fas fa-map-pin"></i>
+                  {{ trabajador.sector }}
+                </p>
+                <p class="activity">
+                  <i class="fas fa-hammer"></i>
+                  {{ trabajador.actividad }}
+                </p>
+                <div class="worker-stats">
+                  <span class="hours">
+                    <i class="fas fa-clock"></i>
+                    {{ trabajador.horasHoy }}h hoy
+                  </span>
+                  @if (trabajador.entrada !== '-') {
+                    <span class="entry-time">
+                      <i class="fas fa-sign-in-alt"></i>
+                      Entrada: {{ trabajador.entrada }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna Derecha -->
+  <div class="right-column">
+    
+    <!-- Alertas Importantes -->
+    <div [class]="'card alerts-card'">
+      <div class="card-header">
+        <h3>
+          <i class="fas fa-bell"></i>
+          Alertas Importantes
+        </h3>
+        <span [class]="'badge alert'">{{ alertasImportantes().length }}</span>
+      </div>
+      <div class="alerts-list">
+        @for (alerta of alertasImportantes(); track alerta.titulo) {
+          <div 
+            [class]="'alert-item ' + alerta.tipo"
+            (click)="procesarAlerta(alerta)"
+            [attr.role]="'button'"
+            [attr.tabindex]="0">
+            <div class="alert-icon">
+              <i 
+                class="fas"
+                [class.fa-exclamation-circle]="alerta.tipo === 'urgent'"
+                [class.fa-exclamation-triangle]="alerta.tipo === 'warning'"
+                [class.fa-info-circle]="alerta.tipo === 'info'"></i>
+            </div>
+            <div class="alert-content">
+              <h4>{{ alerta.titulo }}</h4>
+              <p>{{ alerta.mensaje }}</p>
+              <button 
+                class="alert-action"
+                type="button"
+                [attr.aria-label]="'Ejecutar acción: ' + alerta.accion">
+                {{ alerta.accion }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          <i class="fas fa-history"></i>
+          Actividad Reciente
+        </h3>
+        <button 
+          class="view-all-btn"
+          type="button"
+          [attr.aria-label]="'Ver todas las actividades'">
+          Ver todo
+        </button>
+      </div>
+      <div class="activity-list">
+        @for (actividad of actividadesRecientes(); track actividad.id) {
+          <div [class]="'activity-item ' + actividad.estado">
+            
+            <div class="activity-icon">
+              <i 
+                class="fas"
+                [class.fa-user-check]="actividad.icono === 'user-check'"
+                [class.fa-file-alt]="actividad.icono === 'file-text'"
+                [class.fa-exclamation-circle]="actividad.icono === 'alert-circle'"
+                [class.fa-dollar-sign]="actividad.icono === 'dollar-sign'"
+                [class.fa-user-plus]="actividad.icono === 'user-plus'"></i>
+            </div>
+            
+            <div class="activity-content">
+              <p>{{ actividad.mensaje }}</p>
+              <span class="activity-time">
+                <i class="fas fa-clock"></i>
+                {{ actividad.hora }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Distribución por Sectores -->
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          <i class="fas fa-chart-pie"></i>
+          Distribución por Sectores
+        </h3>
+      </div>
+      <div class="sectors-distribution">
+        @for (sector of distribucionSectores(); track sector.sector) {
+          <div class="sector-item">
+            <div class="sector-info">
+              <h4>{{ sector.sector }}</h4>
+              <p>{{ sector.activos }}/{{ sector.empleados }} empleados</p>
+            </div>
+            <div class="sector-progress">
+              <div 
+                class="progress-bar"
+                [attr.role]="'progressbar'"
+                [attr.aria-valuenow]="sector.porcentaje"
+                [attr.aria-valuemin]="0"
+                [attr.aria-valuemax]="100"
+                [attr.aria-label]="'Progreso del sector ' + sector.sector">
+                <div 
+                  class="progress-fill" 
+                  [style.width.%]="sector.porcentaje"
+                  [style]="{ 
+                    'background': 'linear-gradient(90deg, var(--primary-color), var(--accent-color))' 
+                  }">
+                </div>
+              </div>
+              <span class="sector-percentage">{{ sector.porcentaje }}%</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Métricas Adicionales -->
+<div class="bottom-metrics">
+  <div class="metric-item">
+    <i class="fas fa-calculator"></i>
+    <div>
+      <h4>{{ stats().horasTrabajadasMes | number:'1.0-0' }}</h4>
+      <p>Horas trabajadas este mes</p>
+    </div>
+  </div>
+  
+  <div class="metric-item">
+    <i class="fas fa-chart-line"></i>
+    <div>
+      <h4>{{ promedioHorasDiarias() | number:'1.1-1' }}</h4>
+      <p>Promedio horas/día</p>
+    </div>
+  </div>
+  
+  <div class="metric-item">
+    <i class="fas fa-percentage"></i>
+    <div>
+      <h4>{{ eficienciaGeneral() | number:'1.1-1' }}%</h4>
+      <p>Eficiencia general</p>
+    </div>
+  </div>
+  
+  <div class="metric-item">
+    <i class="fas fa-money-bill-wave"></i>
+    <div>
+      <h4>{{ stats().gastosPersonal | currency:'PEN':'symbol':'1.2-2' }}</h4>
+      <p>Gastos en personal</p>
+    </div>
+  </div>
+</div>
