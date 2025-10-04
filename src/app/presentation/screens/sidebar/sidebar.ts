@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
+import {Header} from '../../components/header/header';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Header],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
@@ -17,11 +18,4 @@ export class Sidebar {
   }
 
   
-  logout(): void {
-    console.log('👋 Cierre de sesión');
-    localStorage.removeItem("id_usuario_actual");
-    localStorage.removeItem("nombre_usuario_actual");
-    localStorage.removeItem("correo_usuario_actual");
-    this.router.navigateByUrl('/login');
-  }
 }

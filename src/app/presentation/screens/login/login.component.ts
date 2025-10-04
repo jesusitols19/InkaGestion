@@ -40,37 +40,60 @@ toggleTheme() {
   }
 }
 
-  onSubmit() {
-    if (this.loginForm.valid) {
-      const { CORREO, CONTRASENIA } = this.loginForm.value;
+onSubmit() {
+  if (this.loginForm.valid) {
+    const { CORREO, CONTRASENIA } = this.loginForm.value;
 
-      const body = {
-        email: CORREO,
-        password: CONTRASENIA
-      };
+    const body = {
+      email: CORREO,
+      password: CONTRASENIA
+    };
 
-      this.http.post<any>(`${environment.apiUrl}/login`, body).subscribe({
-        next: res => {
-          if(res.status === "success"){
-            console.log('✅ Login exitoso:', res);
-            // Guardar en localStorage
-            localStorage.setItem('id_usuario_actual', JSON.stringify(res.data.id));
-            localStorage.setItem('nombre_usuario_actual', JSON.stringify(res.data.nombre));
-            localStorage.setItem('correo_usuario_actual', JSON.stringify(res.data.correo));
-            this.router.navigate(['/dashboard']);
-          }
-          else{
-            alert('Credenciales incorrectas');
-          }
-        },
-        error: err => {
-          console.error('❌ Error de login:', err);
+    // 🔹 Usuario de prueba para desarrollo sin base de datos
+    const dummyUser = {
+      email: 'admin@inkaperu.com',
+      password: '123456',
+      id: 1,
+      nombre: 'Administrador Demo',
+      correo: 'admin@inkaperu.com'
+    };
+
+    // 🔹 Si coincide con usuario de prueba, loguea directo
+    if (body.email === dummyUser.email && body.password === dummyUser.password) {
+      console.log('🧩 Login simulado exitoso');
+      localStorage.setItem('id_usuario_actual', JSON.stringify(dummyUser.id));
+      localStorage.setItem('nombre_usuario_actual', JSON.stringify(dummyUser.nombre));
+      localStorage.setItem('correo_usuario_actual', JSON.stringify(dummyUser.correo));
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    // 🔹 Intentar login real (si el backend está disponible)
+    this.http.post<any>(`${environment.apiUrl}/login`, body).subscribe({
+      next: res => {
+        if (res.status === 'success') {
+          console.log('✅ Login exitoso:', res);
+          localStorage.setItem('id_usuario_actual', JSON.stringify(res.data.id));
+          localStorage.setItem('nombre_usuario_actual', JSON.stringify(res.data.nombre));
+          localStorage.setItem('correo_usuario_actual', JSON.stringify(res.data.correo));
+          this.router.navigate(['/dashboard']);
+        } else {
           alert('Credenciales incorrectas');
         }
-      });
-    } else {
-      this.loginForm.markAllAsTouched();
-    }
+      },
+      error: err => {
+        console.warn('⚠️ No se pudo conectar al backend. Se usa modo demo.');
+        // En caso de error, permitir ingreso en modo demo
+        localStorage.setItem('id_usuario_actual', JSON.stringify(dummyUser.id));
+        localStorage.setItem('nombre_usuario_actual', JSON.stringify(dummyUser.nombre));
+        localStorage.setItem('correo_usuario_actual', JSON.stringify(dummyUser.correo));
+        this.router.navigate(['/dashboard']);
+      }
+    });
+  } else {
+    this.loginForm.markAllAsTouched();
   }
+}
+
 
 }

@@ -1,0 +1,58 @@
+<header class="header">
+  <!-- 🔹 Título de la página -->
+  <div class="page-title">
+    <i class="fa fa-map-marker-alt"></i>
+    <span>{{ currentPage }}</span>
+  </div>
+
+  <!-- 🔹 Acciones del header -->
+  <div class="header-actions">
+
+    <!-- 🔔 Notificaciones -->
+    <div class="notification" (click)="toggleNotifications()">
+      <i class="fa fa-bell"></i>
+      @if (notifications.length > 0) {
+        <span class="badge">{{ notifications.length }}</span>
+      }
+
+      <!-- 🔽 Dropdown de notificaciones -->
+      @if (showNotifications) {
+        <div class="dropdown notifications">
+          <div class="dropdown-header">
+            <span>Notificaciones</span>
+            <button (click)="clearNotifications()">Limpiar</button>
+          </div>
+
+          <ul>
+            @for (notif of notifications; track notif) {
+              <li><i class="fa fa-info-circle"></i> {{ notif }}</li>
+            }
+            @if (notifications.length === 0) {
+              <li class="empty">Sin notificaciones</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+
+    <!-- 👤 Menú de usuario -->
+    <div class="user-menu" (click)="toggleUserMenu()">
+      <img src="assets/images/logo_empresa.png" alt="Usuario" class="user-avatar" />
+      <span class="username">{{ username }}</span>
+      <i class="fa fa-chevron-down"></i>
+
+      <!-- 🔽 Dropdown del usuario -->
+      @if (showUserMenu) {
+        <div class="dropdown user-dropdown">
+          <ul>
+            <li><i class="fa fa-user"></i> Perfil</li>
+            <li><i class="fa fa-cog"></i> Configuración</li>
+            <li><i class="fa fa-shield-alt"></i> Cambiar contraseña</li>
+            <li class="divider"></li>
+            <li (click)="logout()"><i class="fa fa-sign-out-alt"></i> Cerrar sesión</li>
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+</header>

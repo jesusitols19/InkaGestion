@@ -17,35 +17,54 @@ li {
 body {
   font-family: 'Poppins', sans-serif;
   background-color: var(--primary-main);
+  overflow: hidden; /* evita scroll doble */
 }
 
 /* ===== Sidebar Wrapper ===== */
 .wrapper {
   display: flex;
-}
-
-.main {
-  min-height: 100vh;
-  width: 100%;
+  height: 100vh; /* ocupa toda la pantalla */
   overflow: hidden;
-  transition: all 0.35s ease-in-out;
-  background-color: var(--primary-main);
 }
 
 /* ===== Sidebar ===== */
 #sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
   width: 70px;
   min-width: 70px;
   z-index: 1000;
-  transition: all .25s ease-in-out;
+  transition: all 0.25s ease-in-out;
   background: var(--primary-color);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto; /* scroll interno si es largo */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
 }
 
 #sidebar.expand {
   width: 260px;
   min-width: 260px;
+}
+
+/* ===== Main content ===== */
+.main {
+  flex: 1;
+  margin-left: 70px; /* mismo ancho del sidebar cerrado */
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--primary-main);
+  transition: all 0.35s ease-in-out;
+}
+
+/* Cuando el sidebar se expande */
+#sidebar.expand ~ .main {
+  margin-left: 260px;
 }
 
 /* ===== Sidebar Header ===== */
@@ -71,29 +90,19 @@ body {
   transition: all 0.3s ease;
 }
 
-.logo-large {
-  display: none;
-}
-
-
-.sidebar-logo {
-  display: none;
-}
-
 .logo-small {
   border-radius: 50%;
-  padding: 2px; /* opcional: separa del borde */
-  background-color: white; /* opcional, para darle marco */
+  padding: 2px;
+  background-color: white;
 }
 
 .logo-large {
-    width: 100px;  /* más grande que el pequeño */
-    height: auto;  /* mantiene proporción */
-    border-radius: 10%;
-    display: none;
-    margin: 0 auto; /* centra */
-    padding: 2px; /* opcional: separa del borde */
-    
+  width: 100px;
+  height: auto;
+  border-radius: 10%;
+  display: none;
+  margin: 0 auto;
+  padding: 2px;
 }
 
 #sidebar.expand .logo-large {
@@ -118,13 +127,7 @@ body {
 
 .sidebar-logo .subtitulo {
   font-size: 14px;
-  font-weight: bold;
-  color: var(--white);
-}
-
-.sidebar-logo .subtitulo {
-  font-size: 14px;
-  color: var(--amber);   /* usa tu color acento, ejemplo */
+  color: var(--amber);
   letter-spacing: 1px;
 }
 
@@ -171,8 +174,6 @@ a.sidebar-link.active {
 }
 
 /* ===== Footer ===== */
-
-/* ===== Footer ===== */
 .sidebar-footer {
   border-top: 1px solid rgba(255,255,255,0.15);
   padding: 0.75rem 1rem;
@@ -184,7 +185,16 @@ a.sidebar-link.active {
 }
 
 .sidebar-footer .logout:hover {
-  color: var(--white); /* Se vuelve blanco al pasar el mouse */
+  color: var(--white);
   border-left: 3px solid var(--white);
   background-color: rgba(255,255,255,0.1);
+}
+
+/* ===== Scrollbar personalizada ===== */
+#sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+#sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.3);
+  border-radius: 4px;
 }

@@ -1,0 +1,158 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 5px var(--shadow);
+  padding: 0 20px;
+  height: 65px;
+  position: relative;
+  z-index: 10;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  position: relative;
+}
+
+/* 🔔 Notificaciones */
+.notification {
+  position: relative;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--dark-color);
+  transition: color 0.3s;
+}
+
+.notification:hover {
+  color: var(--primary-color);
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background-color: var(--secondary-color);
+  color: white;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 50%;
+}
+
+/* 👤 Usuario */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--dark-color);
+  position: relative;
+  transition: color 0.3s;
+}
+
+.user-menu:hover {
+  color: var(--primary-color);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* 🔽 Dropdown general */
+.dropdown {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 240px;
+  z-index: 999;
+  animation: fadeIn 0.2s ease;
+}
+
+/* 🔔 Dropdown de notificaciones */
+.notifications {
+  right: 80px;
+}
+
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 8px 12px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  font-weight: bold;
+}
+
+.dropdown-header button {
+  background: none;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown li {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown li i {
+  color: var(--primary-color);
+}
+
+.dropdown li:hover {
+  background-color: var(--bg-color);
+}
+
+.dropdown .empty {
+  text-align: center;
+  color: var(--cancel-color);
+  padding: 12px 0;
+}
+
+/* 👤 Dropdown usuario */
+.user-dropdown {
+  width: 200px;
+  right: 0;
+}
+
+.user-dropdown .divider {
+  border-top: 1px solid var(--border-color);
+  margin: 4px 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
