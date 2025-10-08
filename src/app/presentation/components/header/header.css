@@ -7,9 +7,11 @@
   box-shadow: 0 2px 5px var(--shadow);
   padding: 0 20px;
   height: 65px;
-  position: relative;
-  z-index: 10;
+  position: sticky; /* 👈 hace que se mantenga visible */
+  top: 0; /* se fija arriba */
+  z-index: 100; /* encima del contenido */
 }
+
 
 .page-title {
   display: flex;
@@ -89,7 +91,7 @@
 
 /* 🔔 Dropdown de notificaciones */
 .notifications {
-  right: 80px;
+  right: 10px;
 }
 
 .dropdown-header {

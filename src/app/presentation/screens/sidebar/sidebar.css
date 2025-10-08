@@ -27,6 +27,26 @@ body {
   overflow: hidden;
 }
 
+.content-container {
+  padding: 20px;
+  padding-top: 60px; /* espacio para el header */
+  min-height: calc(100vh - 80px); /* altura mínima para evitar salto al cargar */
+}
+
+.header-container {
+  position: fixed; /* 👈 fijo respecto a toda la ventana */
+  top: 0;
+  left: 70px; /* ancho del sidebar cerrado */
+  right: 0;
+  z-index: 1000;
+  transition: left 0.35s ease-in-out;
+}
+
+/* Cuando sidebar está expandido */
+#sidebar.expand ~ .main .header-container {
+  left: 260px;
+}
+
 /* ===== Sidebar ===== */
 #sidebar {
   position: fixed;
@@ -69,6 +89,8 @@ body {
   width: 260px;
   min-width: 260px;
 }
+
+
 
 /* ===== Main content ===== */
 .main-content {

@@ -78,10 +78,13 @@
     
   </aside>
 
-  <main class="main">
-    <app-header></app-header>
-    <section class="main-content">
+  <div class="main">
+    <div class="header-container">
+      <app-header></app-header>
+    </div>
+    <div class="content-container">
       <router-outlet></router-outlet>
-    </section>
-  </main>
+    </div>
+  </div>
+  
 </div>
