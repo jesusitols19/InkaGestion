@@ -1,0 +1,24 @@
+
+<input matInput (keyup)="applyFilter($event)" placeholder="Filtrar datos">
+
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+    @for (col of columns; track col) {
+        <ng-container [matColumnDef]="col.field">
+            <!-- mat-header-cell: son estilos y roles de accebilidad de material -->
+            <!-- *matHeaderCellDef: marca que este <th> es la definición de cabecera para esa columna. -->
+            <!-- Se va a usar automáticamente en el <tr mat-header-row> de abajo. -->
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ col.header }}</th>
+
+            <!-- mat-cell: estilos y roles de Material. -->
+            <!-- *matCellDef="let element": significa por cada fila del dataSource, pásame el objeto (fila) en la variable element -->
+            <td mat-cell *matCellDef="let element">{{ element[col.field] }}</td>
+        </ng-container>
+    }
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+
+<mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
