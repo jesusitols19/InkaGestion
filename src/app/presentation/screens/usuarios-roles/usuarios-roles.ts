@@ -4,10 +4,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environments';
+import { TableComponent } from "../../components/table-dinamic-component/table.component";
 
 @Component({
   selector: 'app-usuarios-roles',
-  imports: [CommonModule, ReactiveFormsModule,HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, TableComponent],
   templateUrl: './usuarios-roles.html',
   styleUrl: './usuarios-roles.css'
 })

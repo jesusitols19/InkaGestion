@@ -65,7 +65,7 @@ toggleTheme() {
         },
         error: err => {
           console.error('❌ Error de login:', err);
-          alert('Credenciales incorrectas');
+          alert('Credenciales incorrectas o error en el servidor');
         }
       });
     } else {

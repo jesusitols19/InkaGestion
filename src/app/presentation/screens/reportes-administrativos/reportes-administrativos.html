@@ -1,1 +1,17 @@
-<p>reportes-administrativos works!</p>
+<!-- usuarios.component.html -->
+<app-material-table 
+  [data]="usuarios" 
+  [columns]="[
+    { field: 'nombre', header: 'Nombre' },
+    { field: 'rol', header: 'Rol' },
+    { field: 'descripcion', header: 'Descripción' }
+  ]">
+</app-material-table>
+
+<app-material-table 
+  [data]="planillas" 
+  [columns]="[
+    { field: 'mes', header: 'MES' },
+    { field: 'total', header: 'TOTAL' },
+  ]">
+</app-material-table>

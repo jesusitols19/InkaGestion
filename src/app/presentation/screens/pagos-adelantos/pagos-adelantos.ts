@@ -8,4 +8,7 @@ import { Component } from '@angular/core';
 })
 export class PagosAdelantos {
 
+  mensaje(){
+    alert("EL boton se presiono");
+  }
 }

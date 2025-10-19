@@ -48,7 +48,7 @@ export const routes: Routes = [
                 canActivate: [authGuard]
             },
             {
-                path: 'trabajadores/control-asistencia',
+                path: 'trabajadores/control-asistencia/:id',
                 component: ControlAsistencia,
                 canActivate: [authGuard]
             },

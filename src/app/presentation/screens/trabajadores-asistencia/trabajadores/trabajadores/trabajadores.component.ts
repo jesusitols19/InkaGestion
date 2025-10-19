@@ -49,11 +49,8 @@ export class TrabajadoresComponent implements OnInit {
   }
 
   onSubmit(): void {
-    // if (this.trabajadorForm.invalid) return;
 
     if (this.editingTrabajadorId) {
-      // alert("Estoy editando");
-      // EDITAR
       this.http.put<any>(`${environment.apiUrl}/update-employee/${this.editingTrabajadorId}`, this.trabajadorForm.value).subscribe({
         next: (res) => {
           if (res.status === "success") {
@@ -95,8 +92,8 @@ export class TrabajadoresComponent implements OnInit {
     });
   }
 
-  verAsistencia(){
-    this.router.navigate(['/trabajadores/control-asistencia']);
+  verAsistencia(idtrabajador: any): void {
+    this.router.navigate(['/trabajadores/control-asistencia', idtrabajador]);
   }
 
   resetForm(): void {
