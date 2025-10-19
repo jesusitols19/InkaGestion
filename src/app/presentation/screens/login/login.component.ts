@@ -40,14 +40,14 @@ toggleTheme() {
   }
 }
 
-  onSubmit() {
-    if (this.loginForm.valid) {
-      const { CORREO, CONTRASENIA } = this.loginForm.value;
+onSubmit() {
+  if (this.loginForm.valid) {
+    const { CORREO, CONTRASENIA } = this.loginForm.value;
 
-      const body = {
-        email: CORREO,
-        password: CONTRASENIA
-      };
+    const body = {
+      email: CORREO,
+      password: CONTRASENIA
+    };
 
       this.http.post<any>(`${environment.apiUrl}/login`, body).subscribe({
         next: res => {
@@ -67,10 +67,11 @@ toggleTheme() {
           console.error('❌ Error de login:', err);
           alert('Credenciales incorrectas o error en el servidor');
         }
-      });
-    } else {
-      this.loginForm.markAllAsTouched();
-    }
+
+    });
+  } else {
+    this.loginForm.markAllAsTouched();
   }
+}
 
 }
