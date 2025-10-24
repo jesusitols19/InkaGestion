@@ -1,0 +1,35 @@
+
+<div class="settings-container">
+    <button 
+    mat-icon-button 
+    class="close-button" 
+    (click)="close()" 
+    aria-label="Cerrar ventana de configuración">
+    <mat-icon>close</mat-icon>
+  </button>
+  <!-- Sidebar -->
+  <aside class="settings-sidebar">
+    <ul>
+      <li [class.active]="selected === 'account'" (click)="selected='account'">Cuenta</li>
+      <li [class.active]="selected === 'security'" (click)="selected='security'">Seguridad</li>
+      <li [class.active]="selected === 'preferences'" (click)="selected='preferences'">Preferencias</li>
+      <li [class.active]="selected === 'notifications'" (click)="selected='notifications'">Notificaciones</li>
+    </ul>
+  </aside>
+
+  <!-- Contenido -->
+  <section class="settings-content">
+    @if (selected === 'account') {
+      <app-account></app-account>
+    }
+    @if (selected === 'security') {
+      <app-security></app-security>
+    }
+    @if (selected === 'preferences') {
+      <app-preferences></app-preferences>
+    }
+    @if (selected === 'notifications') {
+      <app-notifications></app-notifications>
+    }
+  </section>
+</div>

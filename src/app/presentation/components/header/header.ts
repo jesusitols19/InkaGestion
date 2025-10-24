@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { Settings } from '../../screens/settings/settings';
+
+
 @Component({
   selector: 'app-header',
   imports: [],
@@ -7,7 +11,7 @@ import { Router, NavigationEnd } from '@angular/router';
   styleUrl: './header.css'
 })
 export class Header {
- currentPage: string = '';
+  currentPage: string = '';
   username: string = '';
   showNotifications = false;
   showUserMenu = false;
@@ -17,7 +21,10 @@ export class Header {
     'Recordatorio: Jornada especial mañana.'
   ];
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private dialog: MatDialog
+  ) {
     this.username = JSON.parse(localStorage.getItem('nombre_usuario_actual') || '"Invitado"');
 
     // Detectar cambios de ruta
@@ -26,6 +33,18 @@ export class Header {
         this.currentPage = this.getPageTitle(event.urlAfterRedirects);
         this.closeMenus();
       }
+    });
+  }
+
+  openSettings() {
+    this.dialog.open(Settings, {
+      width: '85vw',
+      height: '90vh',
+      maxWidth: '1800px',
+      maxHeight: '95vh',
+      panelClass: 'settings-modal',
+      autoFocus: false,
+      disableClose: true, // <-- Añadido: Evita que el modal se cierre al hacer clic fuera o con la tecla ESC
     });
   }
 

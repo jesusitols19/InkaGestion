@@ -62,3 +62,6 @@
 .tituloI:hover {
   background: linear-gradient(135deg, var(--primary-color-hover), var(--secondary-color-hover));
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
