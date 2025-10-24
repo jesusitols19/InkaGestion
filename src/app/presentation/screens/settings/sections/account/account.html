@@ -1,0 +1,291 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1 class="header-title">Mi Perfil</h1>
+    <p class="header-subtitle">Administra tu información personal y contraseña</p>
+  </div>
+
+  <div class="profile-content">
+    <!-- SECCIÓN: Foto de Perfil -->
+    <mat-card class="profile-card avatar-card">
+      <mat-card-content>
+        <div class="avatar-section">
+          <div class="avatar-wrapper">
+            <img [src]="currentUser.avatar" alt="Avatar" class="user-avatar">
+            <button 
+              mat-mini-fab 
+              color="primary" 
+              class="avatar-edit-btn"
+              (click)="fileInput.click()"
+              aria-label="Cambiar foto de perfil">
+              <mat-icon>photo_camera</mat-icon>
+            </button>
+            <input 
+              #fileInput 
+              id="fileInput"
+              type="file" 
+              accept="image/*" 
+              class="hidden-file-input"
+              title="Seleccionar imagen de perfil"
+              aria-label="Seleccionar imagen de perfil"
+              (change)="onFileSelected($event)">
+          </div>
+          <div class="avatar-info">
+            <h2 class="user-name">{{ currentUser.nombre }}</h2>
+            <p class="user-email">{{ currentUser.correo }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- SECCIÓN: Información Personal -->
+    <mat-card class="profile-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">person</mat-icon>
+          Información Personal
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <form [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nombre Completo</mat-label>
+              <input 
+                matInput 
+                formControlName="nombre" 
+                placeholder="Ingrese su nombre completo">
+              <mat-icon matPrefix>badge</mat-icon>
+              @if (profileForm.get('nombre')?.invalid) {
+                <mat-error>{{ getErrorMessage('profile', 'nombre') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Correo Electrónico</mat-label>
+              <input 
+                matInput 
+                type="email"
+                formControlName="correo" 
+                placeholder="ejemplo@correo.com">
+              <mat-icon matPrefix>email</mat-icon>
+              @if (profileForm.get('correo')?.invalid) {
+                <mat-error>{{ getErrorMessage('profile', 'correo') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Teléfono</mat-label>
+              <input 
+                matInput 
+                formControlName="telefono" 
+                placeholder="+51 987 654 321">
+              <mat-icon matPrefix>phone</mat-icon>
+              @if (profileForm.get('telefono')?.invalid) {
+                <mat-error>{{ getErrorMessage('profile', 'telefono') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="button-group">
+            @if (isEditingProfile) {
+              <button 
+                mat-raised-button 
+                color="primary" 
+                type="submit"
+                [disabled]="profileForm.invalid">
+                <mat-icon>save</mat-icon>
+                Guardar Cambios
+              </button>
+              <button 
+                mat-stroked-button 
+                type="button"
+                (click)="toggleEditProfile()">
+                <mat-icon>close</mat-icon>
+                Cancelar
+              </button>
+            } @else {
+              <button 
+                mat-raised-button 
+                color="primary" 
+                type="button"
+                (click)="toggleEditProfile()">
+                <mat-icon>edit</mat-icon>
+                Editar Información
+              </button>
+            }
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- SECCIÓN: Seguridad y Contraseña -->
+    <mat-card class="profile-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">lock</mat-icon>
+          Seguridad y Contraseña
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        @if (isChangingPassword) {
+          <form 
+            [formGroup]="passwordForm" 
+            (ngSubmit)="onPasswordSubmit()">
+            
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Contraseña Actual</mat-label>
+                <input 
+                  matInput 
+                  [type]="hideCurrentPassword ? 'password' : 'text'"
+                  formControlName="currentPassword"
+                  placeholder="Ingrese su contraseña actual">
+                <mat-icon matPrefix>lock_outline</mat-icon>
+                <button 
+                  mat-icon-button 
+                  matSuffix 
+                  type="button"
+                  (click)="hideCurrentPassword = !hideCurrentPassword">
+                  <mat-icon>{{ hideCurrentPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (passwordForm.get('currentPassword')?.invalid) {
+                  <mat-error>{{ getErrorMessage('password', 'currentPassword') }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nueva Contraseña</mat-label>
+                <input 
+                  matInput 
+                  [type]="hideNewPassword ? 'password' : 'text'"
+                  formControlName="newPassword"
+                  placeholder="Mínimo 8 caracteres">
+                <mat-icon matPrefix>lock</mat-icon>
+                <button 
+                  mat-icon-button 
+                  matSuffix 
+                  type="button"
+                  (click)="hideNewPassword = !hideNewPassword">
+                  <mat-icon>{{ hideNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (passwordForm.get('newPassword')?.invalid) {
+                  <mat-error>{{ getErrorMessage('password', 'newPassword') }}</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Indicador de Fortaleza de Contraseña -->
+              @if (passwordForm.get('newPassword')?.value) {
+                <div class="password-strength">
+                  <div class="strength-bar-container">
+                    <div 
+                      class="strength-bar" 
+                      [style.width]="getPasswordStrength().width"
+                      [style.background-color]="getPasswordStrength().color">
+                    </div>
+                  </div>
+                  <span 
+                    class="strength-text" 
+                    [style.color]="getPasswordStrength().color">
+                    {{ getPasswordStrength().strength }}
+                  </span>
+                </div>
+              }
+
+              <!-- Requisitos de Contraseña -->
+              <div class="password-requirements">
+                <p class="requirements-title">La contraseña debe contener:</p>
+                <ul class="requirements-list">
+                  <li [class.valid]="hasMinLength()">
+                    <mat-icon class="req-icon">{{ hasMinLength() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    Mínimo 8 caracteres
+                  </li>
+                  <li [class.valid]="hasUpperCase()">
+                    <mat-icon class="req-icon">{{ hasUpperCase() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    Una letra mayúscula
+                  </li>
+                  <li [class.valid]="hasLowerCase()">
+                    <mat-icon class="req-icon">{{ hasLowerCase() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    Una letra minúscula
+                  </li>
+                  <li [class.valid]="hasNumeric()">
+                    <mat-icon class="req-icon">{{ hasNumeric() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    Un número
+                  </li>
+                  <li [class.valid]="hasSpecialChar()">
+                    <mat-icon class="req-icon">{{ hasSpecialChar() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    Un carácter especial
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Confirmar Nueva Contraseña</mat-label>
+                <input 
+                  matInput 
+                  [type]="hideConfirmPassword ? 'password' : 'text'"
+                  formControlName="confirmPassword"
+                  placeholder="Vuelva a ingresar la nueva contraseña">
+                <mat-icon matPrefix>lock_clock</mat-icon>
+                <button 
+                  mat-icon-button 
+                  matSuffix 
+                  type="button"
+                  (click)="hideConfirmPassword = !hideConfirmPassword">
+                  <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (passwordForm.hasError('passwordMismatch') && passwordForm.get('confirmPassword')?.touched) {
+                  <mat-error>Las contraseñas no coinciden</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="button-group">
+              <button 
+                mat-raised-button 
+                color="accent" 
+                type="submit"
+                [disabled]="passwordForm.invalid">
+                <mat-icon>check_circle</mat-icon>
+                Actualizar Contraseña
+              </button>
+              <button 
+                mat-stroked-button 
+                type="button"
+                (click)="togglePasswordChange()">
+                <mat-icon>close</mat-icon>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        } @else {
+          <div class="password-info">
+            <div class="info-row">
+              <mat-icon class="info-icon">info</mat-icon>
+              <div class="info-text">
+                <p class="info-title">Contraseña</p>
+                <p class="info-description">Última actualización: hace 3 meses</p>
+              </div>
+            </div>
+            <button 
+              mat-raised-button 
+              color="accent" 
+              (click)="togglePasswordChange()">
+              <mat-icon>vpn_key</mat-icon>
+              Cambiar Contraseña
+            </button>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -45,8 +45,9 @@
       @if (showUserMenu) {
         <div class="dropdown user-dropdown">
           <ul>
-            <li><i class="fa fa-user"></i> Perfil</li>
-            <li><i class="fa fa-cog"></i> Configuración</li>
+            <li (click)="openSettings()">
+              <i class="fa fa-cog"></i> Configuración
+            </li>
             <li class="divider"></li>
             <li (click)="logout()"><i class="fa fa-sign-out-alt"></i> Cerrar sesión</li>
           </ul>
