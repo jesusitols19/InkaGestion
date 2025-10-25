@@ -17,7 +17,7 @@ export class LoginComponent {
 
   loginForm: FormGroup;
   isDarkMode = false;
-  isDevelopmentMode = true; // Cambiar a false cuando uses la BD real
+  isDevelopmentMode = false; // Cambiar a false cuando uses la BD real
 
   constructor(
     private fb: FormBuilder,
@@ -57,7 +57,6 @@ onSubmit() {
   }
 }
 
-// Login en modo desarrollo (sin BD)
 private loginDevelopment(email: string, password: string) {
   // Datos de prueba
   const mockUsers = [
@@ -80,7 +79,6 @@ private loginDevelopment(email: string, password: string) {
   }
 }
 
-// Login en modo producción (con BD)
 private loginProduction(email: string, password: string) {
   const body = {
     email: email,

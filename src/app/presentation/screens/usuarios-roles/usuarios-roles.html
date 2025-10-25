@@ -1,101 +1,50 @@
 <div class="container my-5">
-
-  <div class="card shadow-sm mb-4">
-    <div class="card-header" style="color:black">
-      <h4 class="mb-0 text-center">
-        {{ editingUserId ? 'Editar Usuario' : 'Nuevo Usuario' }}
-      </h4>
-    </div>
-    <div class="card-body">
-      <!-- Formulario -->
-      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">Nombre:</label>
-          <input type="text" class="form-control form-control-sm" formControlName="nombre" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Correo:</label>
-          <input type="email" class="form-control form-control-sm" formControlName="correo" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Password:</label>
-          <input type="password" class="form-control form-control-sm" formControlName="password" />
-        </div>
-
-        <!-- <label>Rol:</label>
-        <select formControlName="role_id">
-          <option value="1">Admin</option>
-          <option value="2">Supervisor</option>
-          <option value="3">Empleado</option>
-        </select> -->
-
-        <div class="col-12 text-center mt-4">
-          <button type="submit" class="btn btn-success btn-sm px-4 me-2 shadow-sm">
-            {{ editingUserId ? 'Actualizar' : 'Guardar' }}
-          </button>
-
-          @if(editingUserId){
-            <button type="button" class="btn btn-outline-secondary btn-sm px-4 shadow-sm" (click)="resetForm()">
-              Cancelar
-            </button>
-          }
-        </div>
-      </form>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold"><i class="bi bi-people-fill me-2"></i>Usuarios Registrados</h3>
+    <button mat-flat-button color="primary" (click)="abrirModalNuevoUsuario()">
+      <i class="bi bi-person-plus me-1"></i> Agregar Usuario
+    </button>
   </div>
 
-  <hr />
-
-  <!-- Tabla de usuarios -->
-  <div class="card shadow-lg">
-    <div class="card-header bg-dark text-white">
-      <h5 class="mb-0 text-center">Lista de Usuarios</h5>
-    </div>
-    <div class="card-body">
+  <mat-card>
+    <mat-card-content>
       <div class="table-responsive">
-        <table class="table table-hover align-middle text-center">
-          <thead class="table-primary">
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Rol</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for(usuario of usuarios; track usuario.id){
-                <tr>
-                    <td>{{ usuario.id }}</td>
-                    <td>{{ usuario.nombre }}</td>
-                    <td>{{ usuario.correo }}</td>
-                    @if(usuario.role_id === 2){
-                        <td>Supervisor</td>
-                    }
-                    <!-- <td>{{ usuario.role_id }}</td> -->
-                    <td>
-                        <button class="btn btn-warning btn-sm shadow-sm" (click)="editarUsuario(usuario)">
-                          ✏️ Editar
-                        </button>
-                    </td>
-                </tr>
-            }
-          </tbody>
+        <table mat-table [dataSource]="usuarios" class="mat-elevation-z2 w-100">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let u">{{ u.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef>Nombre</th>
+            <td mat-cell *matCellDef="let u">{{ u.nombre }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="correo">
+            <th mat-header-cell *matHeaderCellDef>Correo</th>
+            <td mat-cell *matCellDef="let u">{{ u.correo }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="rol">
+            <th mat-header-cell *matHeaderCellDef>Rol</th>
+            <td mat-cell *matCellDef="let u">{{ u.role_name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let u">
+              <button mat-icon-button color="accent" (click)="abrirModalEditarUsuario(u)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['id','nombre','correo','rol','acciones']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['id','nombre','correo','rol','acciones'];"></tr>
+
         </table>
       </div>
-    </div>
-  </div>
-
-<!-- 
-  <app-material-table 
-  [data]="usuarios"
-  [columns]="[
-    { field: 'id', header: 'ID' },
-    { field: 'nombre', header: 'NOMBRE' },
-    { field: 'correo', header: 'CORREO' },
-    { field: 'role_id', header: 'ROL' },
-  ]"/> -->
-
+    </mat-card-content>
+  </mat-card>
 </div>

@@ -1,0 +1,77 @@
+/*
+  Sobrescribimos las variables de Angular Material a nivel del componente
+  para que los campos del formulario usen los colores de tu paleta.
+*/
+:host {
+  /* Fondo de los campos de texto con apariencia "fill" */
+  --mdc-filled-text-field-container-color: var(--bg-color, #f5f7fa);
+  
+  /* Color del borde inferior cuando el campo está enfocado */
+  --mdc-filled-text-field-active-indicator-color: var(--primary-color, #0f9980);
+  
+  /* Color de la etiqueta (label) cuando el campo está enfocado */
+  --mdc-filled-text-field-focus-label-text-color: var(--primary-color, #0f9980);
+}
+
+
+/* --- 🎨 Estilos para el Encabezado --- */
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background-color: var(--primary-color, #0f9980); /* Verde principal de tu paleta */
+  color: var(--white, #FFFFFF); /* Texto y íconos en blanco para contraste */
+}
+
+.dialog-header h2[mat-dialog-title] {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  font-size: 1.25rem;
+}
+
+/* Botón de cierre con color adaptable */
+.close-button {
+  color: var(--white, #FFFFFF);
+  width: 40px;
+  height: 40px;
+}
+
+
+/* --- 📝 Estilos para el Contenido y Formulario --- */
+mat-dialog-content {
+  padding: 24px;
+  background-color: var(--white, #FFFFFF); /* Fondo blanco limpio para el formulario */
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Un poco más de espacio vertical */
+}
+
+/*
+  Ajuste para que el borde de los campos "fill" sea menos pronunciado
+  y el radio de las esquinas sea más sutil.
+*/
+mat-form-field {
+  --mdc-filled-text-field-container-shape: 4px; /* Bordes menos redondeados */
+  --mdc-filled-text-field-disabled-container-color: #f0f0f0;
+}
+
+
+/* --- ✅ Estilos para las Acciones --- */
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end; /* Alinea los botones a la derecha (estándar de UI) */
+  padding: 12px 24px;
+  background-color: var(--bg-color, #f5f7fa); /* Fondo sutil para separar */
+  border-top: 1px solid #e0e0e0;
+}
+
+mat-dialog-actions button {
+  margin-left: 8px;
+}
