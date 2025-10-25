@@ -1,77 +1,14 @@
 <div class="container my-5">
 
-  <div class="card shadow-sm mb-4">
-    <div class="card-header" style="color:black">
-      <h4 class="mb-0 text-center">
-        {{ editingTrabajadorId ? 'Editar Trabajador' : 'Nuevo Trabajador' }}
-      </h4>
-    </div>
-    <div class="card-body">
-      <!-- Formulario -->
-      <form [formGroup]="trabajadorForm" (ngSubmit)="onSubmit()" class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">Número trabajador:</label>
-          <input type="text" class="form-control form-control-sm" formControlName="employee_number" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Nombre:</label>
-          <input type="text" class="form-control form-control-sm" formControlName="nombre" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Documento:</label>
-          <input type="text" class="form-control form-control-sm" formControlName="documento" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Correo:</label>
-          <input type="email" class="form-control form-control-sm" formControlName="correo" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Teléfono:</label>
-          <input type="text" class="form-control form-control-sm" formControlName="telefono" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Tipo de contrato:</label>
-          <select class="form-select form-select-sm" formControlName="contract_type">
-            <option value="Full-Time">Full-Time</option>
-            <option value="Part-Time">Part-Time</option>
-            <option value="Temporal">Temporal</option>
-          </select>
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Salario base:</label>
-          <input type="number" class="form-control form-control-sm" formControlName="salary_base" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Cuenta bancaria:</label>
-          <input type="text" class="form-control form-control-sm" formControlName="bank_account" />
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Área (solo lectura):</label>
-          <input type="number" class="form-control form-control-sm" formControlName="area_id" readonly />
-        </div>
-
-        <div class="col-12 text-center mt-4">
-          <button type="submit" class="btn btn-success btn-sm px-4 me-2 shadow-sm">
-            {{ editingTrabajadorId ? 'Actualizar' : 'Guardar' }}
-          </button>
-
-          @if(editingTrabajadorId){
-            <button type="button" class="btn btn-outline-secondary btn-sm px-4 shadow-sm" (click)="resetForm()">
-              Cancelar
-            </button>
-          }
-        </div>
-      </form>
-    </div>
+  <!-- Botón para "Nuevo Trabajador" -->
+  <div class="d-flex justify-content-end mb-3">
+    <button mat-flat-button color="primary" (click)="abrirModal()">
+      <mat-icon>add</mat-icon>
+      Nuevo Trabajador
+    </button>
   </div>
+
+  <!-- El formulario <div class="card shadow-sm mb-4">...</div> se elimina de aquí -->
 
   <!-- Tabla -->
   <div class="card shadow-lg">
@@ -111,13 +48,21 @@
                 <td>{{ trabajador.bank_account }}</td>
                 <td>
                   <div class="btn-group" role="group">
-                    <button class="btn btn-warning btn-sm shadow-sm" (click)="editarTrabajador(trabajador)">
-                    ✏️ Editar
+                    <!-- ACTUALIZADO: Llama a abrirModal() con el trabajador -->
+                    <button class="btn btn-warning btn-sm shadow-sm" (click)="abrirModal(trabajador)">
+                      ✏️ Editar
                     </button>
+                    <!-- SIN CAMBIOS: Esta función ya era correcta -->
                     <button class="btn btn-info btn-sm shadow-sm text-white" (click)="verAsistencia(trabajador.id)">
-                    📊 Asistencia
+                      📊 Asistencia
                     </button>
-                </div>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="11" class="text-center p-4">
+                  No se encontraron trabajadores.
                 </td>
               </tr>
             }
