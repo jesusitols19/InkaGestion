@@ -1,0 +1,68 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>
+    @if (isEditMode) {
+      <mat-icon>edit</mat-icon> Editar Usuario
+    } @else {
+      <mat-icon>person_add</mat-icon> Nuevo Usuario
+    }
+  </h2>
+  <button mat-icon-button class="close-button" mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="mat-typography">
+  <form [formGroup]="userForm" class="dialog-form">
+
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Nombre</mat-label>
+      <mat-icon matPrefix>person_outline</mat-icon>
+      <input matInput formControlName="nombre" placeholder="Nombre completo" />
+      @if (userForm.get('nombre')?.hasError('required')) {
+        <mat-error>El nombre es requerido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Correo</mat-label>
+      <mat-icon matPrefix>mail_outline</mat-icon>
+      <input matInput type="email" formControlName="correo" placeholder="ejemplo@correo.com" />
+      @if (userForm.get('correo')?.hasError('required')) {
+        <mat-error>El correo es requerido</mat-error>
+      } @else if (userForm.get('correo')?.hasError('email')) {
+        <mat-error>Correo con formato inválido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Contraseña</mat-label>
+      <mat-icon matPrefix>lock_outline</mat-icon>
+      <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Mínimo 6 caracteres" />
+      <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      @if (isEditMode) {
+        <mat-hint>Dejar vacío para no cambiar</mat-hint>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Rol</mat-label>
+       <mat-icon matPrefix>manage_accounts</mat-icon>
+      <mat-select formControlName="role_id">
+        @for (role of data.roles; track role.id) {
+          <mat-option [value]="role.id">{{ role.nombre }}</mat-option>
+        }
+      </mat-select>
+      @if (userForm.get('role_id')?.hasError('required')) {
+        <mat-error>Debes seleccionar un rol</mat-error>
+      }
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="onCancel()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="onSave()" [disabled]="userForm.invalid">Guardar</button>
+</mat-dialog-actions>

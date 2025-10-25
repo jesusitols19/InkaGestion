@@ -17,6 +17,7 @@ export class LoginComponent {
 
   loginForm: FormGroup;
   isDarkMode = false;
+  isDevelopmentMode = false; // Cambiar a false cuando uses la BD real
 
   constructor(
     private fb: FormBuilder,
@@ -44,34 +45,65 @@ onSubmit() {
   if (this.loginForm.valid) {
     const { CORREO, CONTRASENIA } = this.loginForm.value;
 
-    const body = {
-      email: CORREO,
-      password: CONTRASENIA
-    };
-
-      this.http.post<any>(`${environment.apiUrl}/login`, body).subscribe({
-        next: res => {
-          if(res.status === "success"){
-            console.log('✅ Login exitoso:', res);
-            // Guardar en localStorage
-            localStorage.setItem('id_usuario_actual', JSON.stringify(res.data.id));
-            localStorage.setItem('nombre_usuario_actual', JSON.stringify(res.data.nombre));
-            localStorage.setItem('correo_usuario_actual', JSON.stringify(res.data.correo));
-            this.router.navigate(['/dashboard']);
-          }
-          else{
-            alert('Credenciales incorrectas');
-          }
-        },
-        error: err => {
-          console.error('❌ Error de login:', err);
-          alert('Credenciales incorrectas o error en el servidor');
-        }
-
-    });
+    if (this.isDevelopmentMode) {
+      // Modo desarrollo - sin conectar a BD
+      this.loginDevelopment(CORREO, CONTRASENIA);
+    } else {
+      // Modo producción - conectar a BD
+      this.loginProduction(CORREO, CONTRASENIA);
+    }
   } else {
     this.loginForm.markAllAsTouched();
   }
+}
+
+private loginDevelopment(email: string, password: string) {
+  // Datos de prueba
+  const mockUsers = [
+    { id: 1, nombre: 'Admin User', correo: 'admin@test.com', password: '123456' },
+    { id: 2, nombre: 'Test User', correo: 'test@test.com', password: '123456' },
+    { id: 3, nombre: 'Developer', correo: 'dev@test.com', password: '123456' }
+  ];
+
+  const user = mockUsers.find(u => u.correo === email && u.password === password);
+
+  if (user) {
+    console.log('✅ Login exitoso (DESARROLLO):', user);
+    // Guardar en localStorage
+    localStorage.setItem('id_usuario_actual', JSON.stringify(user.id));
+    localStorage.setItem('nombre_usuario_actual', JSON.stringify(user.nombre));
+    localStorage.setItem('correo_usuario_actual', JSON.stringify(user.correo));
+    this.router.navigate(['/dashboard']);
+  } else {
+    alert('Credenciales incorrectas (DESARROLLO)\n\nUsuarios disponibles:\nadmin@test.com\ntest@test.com\ndev@test.com\nContraseña: 123456');
+  }
+}
+
+private loginProduction(email: string, password: string) {
+  const body = {
+    email: email,
+    password: password
+  };
+
+  this.http.post<any>(`${environment.apiUrl}/login`, body).subscribe({
+    next: res => {
+      if(res.status === "success"){
+        console.log('✅ Login exitoso:', res);
+        // Guardar en localStorage
+        localStorage.setItem('id_usuario_actual', JSON.stringify(res.data.id));
+        localStorage.setItem('nombre_usuario_actual', JSON.stringify(res.data.nombre));
+        localStorage.setItem('correo_usuario_actual', JSON.stringify(res.data.correo));
+        this.router.navigate(['/dashboard']);
+      }
+      else{
+        alert('Credenciales incorrectas');
+      }
+    },
+    error: err => {
+      console.error('❌ Error de login:', err);
+      alert('Credenciales incorrectas o error en el servidor');
+    }
+  });
 }
 
 }
