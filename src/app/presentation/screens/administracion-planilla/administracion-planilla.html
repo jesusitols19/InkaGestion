@@ -1,1 +1,140 @@
-<p>administracion-planilla works!</p>
+<div class="container mt-4 mb-5">
+    <h2 class="text-center mb-4 text-primary fw-bold">🧾 Administración de Planillas</h2>
+
+    <!-- ===================== -->
+    <!-- SECCIÓN: PERIODOS -->
+    <!-- ===================== -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">📆 Periodos de Planilla</h5>
+        <button class="btn btn-light btn-sm fw-semibold" (click)="abrirModalPeriodo()">➕ Nuevo</button>
+      </div>
+
+      <div class="card-body">
+        <table class="table table-hover align-middle">
+          <thead class="table-secondary">
+            <tr>
+              <th>ID</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of periodos">
+              <td>{{ p.id }}</td>
+              <td>{{ p.start_date }}</td>
+              <td>{{ p.end_date }}</td>
+              <td>
+                <span class="badge bg-{{ p.status === 'OPEN' ? 'success' : 'secondary' }}">
+                  {{ p.status }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary" (click)="editarPeriodo(p)">
+                  ✏️ Editar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===================== -->
+    <!-- SECCIÓN: PLANILLAS -->
+    <!-- ===================== -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">💼 Planillas Generadas</h5>
+        <button class="btn btn-light btn-sm fw-semibold" (click)="abrirModalPlanilla()">➕ Generar</button>
+      </div>
+
+      <div class="card-body">
+        <table class="table table-striped align-middle">
+          <thead class="table-secondary">
+            <tr>
+              <th>ID</th>
+              <th>Empleado</th>
+              <th>Periodo</th>
+              <th>Bruto</th>
+              <th>Descuentos</th>
+              <th>Neto</th>
+              <th>Procesado Por</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of planillas">
+              <td>{{ p.id }}</td>
+              <td>{{ p.employee?.name || p.employee_id }}</td>
+              <td>{{ p.period }}</td>
+              <td>S/. {{ p.gross }}</td>
+              <td>S/. {{ p.total_deductions }}</td>
+              <td><strong>S/. {{ p.net_pay }}</strong></td>
+              <td>{{ p.processed_by.name || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===================== -->
+    <!-- MODAL: PERIODO -->
+    <!-- ===================== -->
+    <div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModalPeriodo">
+      <div class="modal-dialog">
+        <div class="modal-content p-3 border-0 shadow-lg">
+          <h5 class="modal-title mb-3">
+            {{ editandoPeriodo ? '✏️ Editar Periodo' : '🆕 Nuevo Periodo' }}
+          </h5>
+          <form [formGroup]="formPeriodo" (ngSubmit)="guardarPeriodo()">
+            <div class="mb-3">
+              <label class="form-label">Fecha Inicio</label>
+              <input type="date" formControlName="start_date" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Fecha Fin</label>
+              <input type="date" formControlName="end_date" class="form-control">
+            </div>
+            <div class="mb-3" *ngIf="editandoPeriodo">
+              <label class="form-label">Estado</label>
+              <select formControlName="status" class="form-select">
+                <option value="OPEN">Abierto</option>
+                <option value="CLOSED">Cerrado</option>
+              </select>
+            </div>
+            <div class="text-end">
+              <button type="submit" class="btn btn-success me-2">Guardar</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalPeriodo()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== -->
+    <!-- MODAL: PLANILLA -->
+    <!-- ===================== -->
+    <div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModalPlanilla">
+      <div class="modal-dialog">
+        <div class="modal-content p-3 border-0 shadow-lg">
+          <h5 class="modal-title mb-3">🧾 Generar Nueva Planilla</h5>
+          <form [formGroup]="formPlanilla" (ngSubmit)="generarPlanilla()">
+            <div class="mb-3">
+              <label class="form-label">Empleado ID</label>
+              <input type="number" formControlName="employee_id" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Periodo ID</label>
+              <input type="number" formControlName="period_id" class="form-control">
+            </div>
+            <div class="text-end">
+              <button type="submit" class="btn btn-success me-2">Generar</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalPlanilla()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>

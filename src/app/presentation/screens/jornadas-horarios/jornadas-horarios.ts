@@ -1,125 +1,92 @@
 import { Component, OnInit } from '@angular/core';
 import { ReusableTable } from '../../components/reusable-table/reusable-table';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-jornadas-horarios',
   standalone: true,
-  imports: [ReusableTable],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,           // ✅ Agrega esto
+    ReusableTable,
+    HttpClientModule
+  ],
   templateUrl: './jornadas-horarios.html',
   styleUrl: './jornadas-horarios.css'
 })
 export class JornadasHorarios implements OnInit {
 
-  empleados = [
-    { 
-      id: 1, 
-      nombre: 'Juan Pérez', 
-      area: 'Campo Norte', 
-      cargo: 'Supervisor',
-      fechaIngreso: new Date('2023-01-15'),
-      salario: 2500,
-      activo: true
-    },
-    { 
-      id: 2, 
-      nombre: 'María García', 
-      area: 'Invernadero', 
-      cargo: 'Técnico',
-      fechaIngreso: new Date('2023-03-20'),
-      salario: 2000,
-      activo: true
-    },
-    { 
-      id: 3, 
-      nombre: 'Carlos López',
-      area: 'Empaque',
-      cargo: 'Operario',
-      fechaIngreso: new Date('2022-11-05'),
-      salario: 1800,
-      activo: false
-    }
-    // ... más datos
-  ];
+  apiBase = 'http://localhost:8000'; // ajusta según tu backend FastAPI
 
-  columnas = [
-    { field: 'nombre', header: 'Nombre Completo', type: 'text' as const, sortable: true },
-    { field: 'area', header: 'Área de Trabajo', type: 'text' as const, filterable: true },
-    { field: 'cargo', header: 'Cargo', type: 'text' as const, filterable: true },
-
-    { field: 'salario', header: 'Salario', type: 'number' as const, format: '1.0-0' },
-    { field: 'activo', header: 'Estado', type: 'boolean' as const }
-  ];
-
-  filtrosPersonalizados = [
-    {
-      field: 'fechaIngreso',
-      type: 'date' as const,
-      label: 'Fecha de Ingreso',
-      placeholder: 'Filtrar por fecha'
-    },
-    {
-      field: 'salario',
-      type: 'number' as const,
-      label: 'Salario Mínimo',
-      placeholder: 'Salario desde...'
-    }
-  ];
-
-  configuracionTabla = {
-    exportEnabled: true,
-    globalSearch: true,
-    columnFilters: true,
-    advancedFilters: true,
-    selectionMode: 'single' as const,
-    responsive: true
+  // ===== TURNOS =====
+  shifts: any[] = [];
+  newShift: any = {
+    name: '',
+    start_time: '',
+    end_time: '',
+    tolerance_minutes: 0,
+    description: '',
+    created_by: localStorage.getItem('id_usuario_actual') || 1
   };
 
+  // ===== ASIGNACIÓN EMPLEADO - TURNO =====
+  employeeShifts: any[] = [];
+  newEmployeeShift: any = {
+    employee_id: '',
+    shift_id: '',
+    start_date: '',
+    end_date: ''
+  };
+
+  constructor(private http: HttpClient) {}
+
   ngOnInit(): void {
-    // Cargar datos si es necesario
-    this.cargarEmpleados();
+    this.loadShifts();
+    this.loadEmployeeShifts();
   }
 
-  onEmpleadoSeleccionado(event: any): void {
-    console.log('Empleado seleccionado:', event.data);
-    // Hacer algo con el empleado seleccionado
+  // === Turnos ===
+  loadShifts() {
+    this.http.get(`${this.apiBase}/get-all-shift`).subscribe((res: any) => {
+      this.shifts = res.data || [];
+    });
   }
 
-  onExportarDatos(formato: string): void {
-    console.log('Exportando en formato:', formato);
-    // Lógica de exportación
-    switch(formato) {
-      case 'excel':
-        this.exportarAExcel();
-        break;
-      case 'csv':
-        this.exportarACSV();
-        break;
-      case 'pdf':
-        this.exportarAPDF();
-        break;
+  createShift() {
+    if (!this.newShift.name || !this.newShift.start_time || !this.newShift.end_time) {
+      alert('Por favor completa todos los campos obligatorios.');
+      return;
     }
+    this.http.post(`${this.apiBase}/create-shift`, this.newShift).subscribe((res: any) => {
+      alert('Turno creado correctamente');
+      this.newShift = { name: '', start_time: '', end_time: '', tolerance_minutes: 0, description: '', created_by: localStorage.getItem('id_usuario_actual') || 1 };
+      this.loadShifts();
+    });
   }
 
-  onFiltrosCambiados(filtros: any): void {
-    console.log('Filtros aplicados:', filtros);
-    // Opcional: guardar estado de filtros
+  // === Asignación de Turnos ===
+  loadEmployeeShifts() {
+    this.http.get(`${this.apiBase}/get-all-employee-shift`).subscribe((res: any) => {
+      this.employeeShifts = res.data || [];
+    });
   }
 
-  private cargarEmpleados(): void {
-    // Aquí cargarías desde tu servicio
-    // this.empleadoService.getEmpleados().subscribe(data => this.empleados = data);
-  }
+  assignEmployeeShift() {
+    if (!this.newEmployeeShift.employee_id || !this.newEmployeeShift.shift_id || !this.newEmployeeShift.start_date) {
+      alert('Completa los datos requeridos.');
+      return;
+    }
 
-  private exportarAExcel(): void {
-    // Implementar exportación a Excel
-  }
-
-  private exportarACSV(): void {
-    // Implementar exportación a CSV
-  }
-
-  private exportarAPDF(): void {
-    // Implementar exportación a PDF
+    this.http.post(`${this.apiBase}/create-employee-shift`, this.newEmployeeShift).subscribe((res: any) => {
+      alert('Turno asignado correctamente');
+      this.newEmployeeShift = { employee_id: '', shift_id: '', start_date: '', end_date: '' };
+      this.loadEmployeeShifts();
+    });
   }
 }
