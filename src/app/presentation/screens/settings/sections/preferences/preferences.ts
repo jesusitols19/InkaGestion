@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, Renderer2 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,8 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatCardModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatSlideToggleModule,
-    MatButtonModule,
+    MatButtonModule, // Ya no se usa MatSlideToggleModule
     MatSnackBarModule,
     MatIconModule
   ],
@@ -29,55 +27,69 @@ import { MatIconModule } from '@angular/material/icon';
 export class Preferences implements OnInit {
 
   preferencesForm!: FormGroup;
+  isDarkMode: boolean = false;
 
   // Simulación de las preferencias actuales del usuario
   currentUserPreferences = {
-    theme: 'light',
+    theme: 'light', // 'light' o 'dark'
     language: 'es',
-    notifications: {
-      email: true,
-      push: false
-    }
   };
 
   constructor(
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private renderer: Renderer2,
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   ngOnInit(): void {
+    // Lee el tema guardado desde localStorage
+    this.currentUserPreferences.theme = localStorage.getItem('theme') || 'light';
+    this.isDarkMode = this.currentUserPreferences.theme === 'dark';
+    this.applyTheme(this.isDarkMode); // Aplica el tema al cargar
+
     this.preferencesForm = this.fb.group({
       theme: [this.currentUserPreferences.theme],
       language: [this.currentUserPreferences.language],
-      emailNotifications: [this.currentUserPreferences.notifications.email],
-      pushNotifications: [this.currentUserPreferences.notifications.push]
     });
   }
 
-  onThemeChange(event: any): void {
-    const theme = event.checked ? 'dark' : 'light';
+  toggleTheme() {
+    this.isDarkMode = !this.isDarkMode;
+    const theme = this.isDarkMode ? 'dark' : 'light';
+    
+    // 1. Aplica el tema visualmente
+    this.applyTheme(this.isDarkMode);
+    
+    // 2. Actualiza el valor en el formulario
     this.preferencesForm.get('theme')?.setValue(theme);
-    // Aquí podrías añadir lógica para cambiar el tema de la aplicación en tiempo real
-    document.body.classList.toggle('dark-theme', event.checked);
-    console.log(`Tema cambiado a: ${theme}`);
+    
+    // 3. Guarda en localStorage para persistencia
+    localStorage.setItem('theme', theme);
+  }
+
+  private applyTheme(isDark: boolean): void {
+    if (isDark) {
+      this.renderer.addClass(this.document.body, 'dark-theme');
+    } else {
+      this.renderer.removeClass(this.document.body, 'dark-theme');
+    }
   }
 
   onSubmit(): void {
     if (this.preferencesForm.valid) {
       const newPrefs = this.preferencesForm.value;
-      
-      // Simulación de guardado de datos
+
       this.currentUserPreferences = {
         theme: newPrefs.theme,
-        language: newPrefs.language,
-        notifications: {
-          email: newPrefs.emailNotifications,
-          push: newPrefs.pushNotifications
-        }
+        language: newPrefs.language
       };
+      
+      // Asegura que localStorage esté sincronizado al guardar
+      localStorage.setItem('theme', newPrefs.theme);
 
       console.log('Preferencias guardadas:', this.currentUserPreferences);
-      
+
       this.snackBar.open('✓ Preferencias guardadas correctamente', 'Cerrar', {
         duration: 3000,
         horizontalPosition: 'end',
@@ -88,15 +100,15 @@ export class Preferences implements OnInit {
   }
 
   onCancel(): void {
-    // Restablece el formulario a los valores originales
+    // Restablece el formulario a los valores originales guardados
     this.preferencesForm.patchValue({
       theme: this.currentUserPreferences.theme,
       language: this.currentUserPreferences.language,
-      emailNotifications: this.currentUserPreferences.notifications.email,
-      pushNotifications: this.currentUserPreferences.notifications.push
     });
-    
-    // Asegura que el toggle visualmente refleje el estado correcto
-    document.body.classList.toggle('dark-theme', this.currentUserPreferences.theme === 'dark');
+
+    // Asegura que el toggle y el tema visual reflejen el estado cancelado
+    this.isDarkMode = this.currentUserPreferences.theme === 'dark';
+    this.applyTheme(this.isDarkMode);
   }
 }
+
