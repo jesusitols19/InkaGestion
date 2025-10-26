@@ -1,1 +1,61 @@
-<p>preferences works!</p>
+<div class="preferences-container">
+  <div class="preferences-header">
+    <h1 class="header-title">Preferencias</h1>
+    <p class="header-subtitle">Personaliza la apariencia y el comportamiento de la aplicación.</p>
+  </div>
+
+  <form [formGroup]="preferencesForm" (ngSubmit)="onSubmit()">
+    <mat-card class="preference-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">palette</mat-icon>
+          Apariencia
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="preference-item">
+          <mat-slide-toggle
+            [checked]="preferencesForm.get('theme')?.value === 'dark'"
+            (change)="onThemeChange($event)"
+            formControlName="theme">
+            Modo Oscuro
+          </mat-slide-toggle>
+          <p class="preference-description">Activa esta opción para una interfaz con colores oscuros.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="preference-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">language</mat-icon>
+          Idioma y Región
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="preference-item">
+          <mat-form-field appearance="fill" class="language-select">
+            <mat-label>Idioma</mat-label>
+            <mat-select formControlName="language">
+              <mat-option value="es">Español</mat-option>
+              <mat-option value="en">Inglés</mat-option>
+              <mat-option value="pt">Portugués</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <p class="preference-description">Selecciona el idioma de la interfaz de usuario.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="button-group">
+      <button mat-raised-button color="primary" type="submit">
+        <mat-icon>save</mat-icon>
+        Guardar Preferencias
+      </button>
+      <button mat-stroked-button type="button" (click)="onCancel()">
+        <mat-icon>cancel</mat-icon>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

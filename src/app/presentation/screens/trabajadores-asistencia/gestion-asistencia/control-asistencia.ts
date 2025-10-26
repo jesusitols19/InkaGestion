@@ -4,6 +4,13 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../../../../environments/environments';
+import {  OnInit, inject, DestroyRef } from '@angular/core';
+import { interval } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+
+registerLocaleData(localeEs, 'es-ES');
 
 @Component({
   selector: 'app-control-asistencia',
@@ -11,19 +18,17 @@ import { environment } from '../../../../../environments/environments';
   templateUrl: './control-asistencia.html',
   styleUrl: './control-asistencia.css'
 })
-export class ControlAsistencia {
+export class ControlAsistencia implements OnInit {
 
   empleado: any;
   asistencias: any[] = [];
   asistenciaActiva: any = null;
-
-
   registro = { justificacion: '' };
-
   trabajadorId!: string | null;
-
   turnoActual: any = null;
 
+  private destroyRef = inject(DestroyRef);
+  public fechaHoraActual: Date = new Date();
   constructor(private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit(): void {
@@ -33,6 +38,15 @@ export class ControlAsistencia {
       this.cargarAsistencias(this.trabajadorId);
       this.cargarTurnoActual(this.trabajadorId);
     }
+    this.iniciarReloj();
+  }
+
+    private iniciarReloj(): void {
+    interval(1000) // Se ejecuta cada 1000ms (1 segundo)
+      .pipe(takeUntilDestroyed(this.destroyRef)) // Se destruye automáticamente con el componente
+      .subscribe(() => {
+        this.fechaHoraActual = new Date();
+      });
   }
 
   cargarEmpleado(id: string | null) {
@@ -76,7 +90,7 @@ export class ControlAsistencia {
   registrarEntrada() {
     const payload = {
       employee_id: this.empleado.id,
-      supervisor_user_id: 7,
+      supervisor_user_id: 2,
       justification: this.registro.justificacion || null
     };
 
