@@ -1,11 +1,122 @@
-<app-reusable-table
-      [data]="empleados"
-      [columns]="columnas"
-      [title]="'Lista de Empleados'"
-      [autoFilters]="['area', 'cargo']"
-      [customFilters]="filtrosPersonalizados"
-      [config]="configuracionTabla"
-      (onRowSelect)="onEmpleadoSeleccionado($event)"
-      (onExport)="onExportarDatos($event)"
-      (onFiltersChange)="onFiltrosCambiados($event)">
-</app-reusable-table>
+<div class="container mt-4">
+  <h3 class="text-center mb-4 fw-bold">🕓 Gestión de Jornadas y Horarios</h3>
+
+  <!-- ======================= SECCIÓN TURNOS ======================= -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white fw-semibold">
+      Gestión de Turnos
+    </div>
+    <div class="card-body">
+      <form class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Nombre del Turno</label>
+          <input type="text" class="form-control" [(ngModel)]="newShift.name" name="name" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Hora Inicio</label>
+          <input type="time" class="form-control" [(ngModel)]="newShift.start_time" name="start_time" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Hora Fin</label>
+          <input type="time" class="form-control" [(ngModel)]="newShift.end_time" name="end_time" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Tolerancia (min)</label>
+          <input type="number" class="form-control" [(ngModel)]="newShift.tolerance_minutes" name="tolerance_minutes" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Descripción</label>
+          <input type="text" class="form-control" [(ngModel)]="newShift.description" name="description" />
+        </div>
+        <div class="col-12 text-end">
+          <button type="button" (click)="createShift()" class="btn btn-success mt-2">➕ Crear Turno</button>
+        </div>
+      </form>
+
+      <hr />
+
+      <h5 class="fw-semibold">📋 Turnos Registrados</h5>
+      <table class="table table-hover table-striped align-middle mt-2">
+        <thead class="table-primary">
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Tolerancia</th>
+            <th>Descripción</th>
+            <th>Creado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of shifts; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.start_time }}</td>
+            <td>{{ s.end_time }}</td>
+            <td>{{ s.tolerance_minutes }} min</td>
+            <td>{{ s.description || '-' }}</td>
+            <td>{{ s.created_at | date:'short' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================= SECCIÓN ASIGNACIÓN ======================= -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white fw-semibold">
+      Asignación de Turnos a Empleados
+    </div>
+    <div class="card-body">
+      <form class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Empleado ID</label>
+          <input type="number" class="form-control" [(ngModel)]="newEmployeeShift.employee_id" name="employee_id" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Turno</label>
+          <select class="form-select" [(ngModel)]="newEmployeeShift.shift_id" name="shift_id">
+            <option value="" disabled selected>Seleccione un turno</option>
+            <option *ngFor="let s of shifts" [value]="s.id">{{ s.name }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Fecha Inicio</label>
+          <input type="date" class="form-control" [(ngModel)]="newEmployeeShift.start_date" name="start_date" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Fecha Fin</label>
+          <input type="date" class="form-control" [(ngModel)]="newEmployeeShift.end_date" name="end_date" />
+        </div>
+        <div class="col-12 text-end">
+          <button type="button" (click)="assignEmployeeShift()" class="btn btn-success mt-2">➕ Asignar Turno</button>
+        </div>
+      </form>
+
+      <hr />
+
+      <h5 class="fw-semibold">👥 Turnos Asignados</h5>
+      <table class="table table-hover table-striped align-middle mt-2">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Empleado</th>
+            <th>Turno ID</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let es of employeeShifts; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ es.employee_id }}</td>
+            <td>{{ es.shift_id }}</td>
+            <td>{{ es.start_date }}</td>
+            <td>{{ es.end_date || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

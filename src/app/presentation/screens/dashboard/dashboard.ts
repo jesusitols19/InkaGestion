@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {OnInit, OnDestroy, signal, computed, inject, DestroyRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { interval, Observable } from 'rxjs';
 
 // Interfaces para type safety
@@ -15,6 +16,7 @@ interface EstadisticasPrincipales {
   ingresosMes: number;
   gastosPersonal: number;
   horasTrabajadasMes: number;
+  promedioHorasDiarias: number;
 }
 
 interface ActividadReciente {
@@ -59,7 +61,7 @@ interface AlertaImportante {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, CurrencyPipe, DecimalPipe],
+  imports: [CommonModule, CurrencyPipe, DecimalPipe, HttpClientModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
@@ -78,7 +80,8 @@ export class Dashboard implements OnInit, OnDestroy {
     pagosPendientes: 12,
     ingresosMes: 45680.50,
     gastosPersonal: 28450.75,
-    horasTrabajadasMes: 3248
+    horasTrabajadasMes: 3248,
+    promedioHorasDiarias: 8.2
   });
 
   // Signal para controlar el estado de carga
@@ -260,9 +263,28 @@ export class Dashboard implements OnInit, OnDestroy {
     };
   });
 
-  constructor() {
+  constructor(private http: HttpClient) {
     // Inicializar actualizaciones automáticas
+    this.datosGeneralesDashboard();
     this.inicializarActualizacionesAutomaticas();
+  }
+
+  datosGeneralesDashboard(): void {
+    this.http.get<any>('http://localhost:8000/get-full-dashboard')
+        .subscribe( (response => {
+          this.stats.update(stats => ({
+            ...stats,
+            totalEmpleados: response.data.total_empleados.total_empleados,
+            gastosPersonal: response.data.gasto_personal_total.gasto_total_personal,
+            horasTrabajadasMes: response.data.horas_trabajadas_total_general.total_general ?? 0,
+            pagosPendientes: response.data.pagos_pendientes.pagos_pendientes,
+            promedioHorasDiarias: response.data.promedio_horas_hoy.promedio_horas_hoy ?? 0,
+            asistenciaHoy: response.data.resumen_asistencia_hoy.empleados_presentes ?? 0,
+            asistenciaPorcentaje: response.data.resumen_asistencia_hoy.porcentaje_asistencia ?? 0
+
+          }));
+          console.log(response.data.total_empleados.total_empleados);
+        }));
   }
 
   ngOnInit(): void {

@@ -1,23 +1,162 @@
+<div class="container mt-4 mb-5">
+    <h2 class="text-center mb-4 text-primary fw-bold">💵 Módulo de Pagos y Adelantos</h2>
 
-<div class = "bg-blue-300 p-10 m-10 rounded text-white">
+    <!-- ===================================== -->
+    <!-- SECCIÓN ADELANTOS -->
+    <!-- ===================================== -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">💰 Adelantos</h5>
+        <button class="btn btn-light btn-sm fw-semibold" (click)="abrirModalAdelanto()">➕ Nuevo</button>
+      </div>
 
-    <button (click)="mensaje()" class="hover:bg-white text-black bg-blue-500 rounded p-2">Presiona aqui</button>
+      <div class="card-body">
+        <table class="table table-hover align-middle">
+          <thead class="table-secondary">
+            <tr>
+              <th>ID</th>
+              <th>Empleado</th>
+              <th>Monto</th>
+              <th>Estado</th>
+              <th>Nota</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of adelantos">
+              <td>{{ a.id }}</td>
+              <td>{{ a.employee_id }}</td>
+              <td>S/. {{ a.amount }}</td>
+              <td>
+                <span class="badge bg-{{ colorEstado(a.status) }}">{{ a.status }}</span>
+              </td>
+              <td>{{ a.note || '-' }}</td>
+              <td>
+                <button *ngIf="a.status === 'PENDING'" class="btn btn-sm btn-outline-success me-1"
+                  (click)="abrirModalAprobacion(a)">✔️ Aprobar</button>
+                <button *ngIf="a.status === 'APPROVED'" class="btn btn-sm btn-outline-warning me-1"
+                  (click)="marcarPagado(a.id)">💸 Pagar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-    <button class="bg-blue-500 text-white px-4 py-2 rounded transition-all duration-300 hover:bg-blue-700">
-  Suave hover
-</button>
+    <!-- ===================================== -->
+    <!-- SECCIÓN PAGOS / CORRIDAS -->
+    <!-- ===================================== -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">🏦 Corridas de Pago</h5>
+        <button class="btn btn-light btn-sm fw-semibold" (click)="crearCorrida()">➕ Crear Corrida</button>
+      </div>
 
+      <div class="card-body">
+        <table class="table table-striped align-middle">
+          <thead class="table-secondary">
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Total</th>
+              <th>Archivo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of corridas">
+              <td>{{ c.id }}</td>
+              <td>{{ c.run_date }}</td>
+              <td>S/. {{ c.total_amount }}</td>
+              <td>{{ c.file_name || '-' }}</td>
+              <td>
+                <span class="badge bg-{{ colorEstadoCorrida(c.status) }}">{{ c.status }}</span>
+              </td>
+              <td>
+                <button *ngIf="c.status === 'PENDING'" class="btn btn-sm btn-outline-primary me-1"
+                  (click)="abrirModalItem(c)">➕ Ítem</button>
+                <button *ngIf="c.status === 'PENDING'" class="btn btn-sm btn-outline-success me-1"
+                  (click)="generarArchivoBanco(c)">📁 Generar Archivo</button>
+                <button *ngIf="c.status === 'PENDING'" class="btn btn-sm btn-outline-secondary"
+                  (click)="cerrarCorrida(c)">✅ Cerrar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-</div>
-<p class = "bg-blue-300 text-white p-10 mx-10 rounded lowercase">Texto de prueba</p>
+    <!-- ===================================== -->
+    <!-- MODAL ADELANTO -->
+    <!-- ===================================== -->
+    <div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModalAdelanto">
+      <div class="modal-dialog">
+        <div class="modal-content p-3 border-0 shadow-lg">
+          <h5 class="modal-title mb-3">🆕 Solicitar Adelanto</h5>
+          <form [formGroup]="formAdelanto" (ngSubmit)="crearAdelanto()">
+            <div class="mb-3">
+              <label class="form-label">Empleado ID</label>
+              <input type="number" formControlName="employee_id" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Monto</label>
+              <input type="number" formControlName="amount" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Nota</label>
+              <textarea formControlName="note" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="text-end">
+              <button type="submit" class="btn btn-success me-2">Guardar</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalAdelanto()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-<div class="max-w-sm mx-auto my-20 bg-blue-300 rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-  <img class="w-full h-48 object-cover" src="https://picsum.photos/600/400" alt="Imagen">
-  <div class="p-4">
-    <h2 class="text-xl font-semibold text-gray-800 mb-2">Título del producto</h2>
-    <p class="text-blue-500 mb-4">Descripción breve del producto que estás viendo.</p>
-    <button class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors duration-200">
-      Comprar
-    </button>
+    <!-- MODAL APROBACIÓN -->
+    <div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModalAprobacion">
+      <div class="modal-dialog">
+        <div class="modal-content p-3 border-0 shadow-lg">
+          <h5 class="modal-title mb-3">✔️ Aprobar / Rechazar Adelanto</h5>
+          <p><strong>Adelanto ID:</strong> {{ adelantoSeleccionado?.id }}</p>
+          <p><strong>Monto:</strong> S/. {{ adelantoSeleccionado?.amount }}</p>
+          <div class="text-end">
+            <button class="btn btn-success me-2" (click)="aprobarAdelanto(true)">Aprobar</button>
+            <button class="btn btn-danger me-2" (click)="aprobarAdelanto(false)">Rechazar</button>
+            <button class="btn btn-outline-secondary" (click)="cerrarModalAprobacion()">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL AGREGAR ÍTEM A CORRIDA -->
+    <div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModalItem">
+      <div class="modal-dialog">
+        <div class="modal-content p-3 border-0 shadow-lg">
+          <h5 class="modal-title mb-3">➕ Agregar Ítem a Corrida</h5>
+          <form [formGroup]="formItem" (ngSubmit)="agregarItem()">
+            <div class="mb-3">
+              <label class="form-label">Empleado ID</label>
+              <input type="number" formControlName="employee_id" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Monto</label>
+              <input type="number" formControlName="amount" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Cuenta Bancaria</label>
+              <input type="text" formControlName="bank_account" class="form-control">
+            </div>
+            <div class="text-end">
+              <button type="submit" class="btn btn-success me-2">Guardar</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalItem()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
   </div>
-</div>
