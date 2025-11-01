@@ -46,7 +46,7 @@ export class PagosAdelantos implements OnInit {
 
   // ================= ADELANTOS =================
   cargarAdelantos() {
-    this.http.get<any>('http://localhost:8000/advances').subscribe(res => this.adelantos = res.data || []);
+    this.http.get<any>('http://localhost:8000/get-all-advances').subscribe(res => this.adelantos = res.data || []);
   }
 
   crearAdelanto() {
@@ -105,7 +105,7 @@ export class PagosAdelantos implements OnInit {
 
   // ================= CORRIDAS =================
   cargarCorridas() {
-    this.http.get<any>('http://localhost:8000/payment-runs').subscribe(res => this.corridas = res.data || []);
+    this.http.get<any>('http://localhost:8000/get-all-payment-runs').subscribe(res => this.corridas = res.data || []);
   }
 
   crearCorrida() {
