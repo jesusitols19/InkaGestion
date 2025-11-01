@@ -1,0 +1,156 @@
+/* Contenedor principal con animación de entrada */
+.preferences-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Encabezado de la sección */
+.preferences-header {
+  margin-bottom: 2.5rem;
+}
+
+.header-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  margin: 0 0 0.5rem 0;
+}
+
+.header-subtitle {
+  font-size: 0.95rem;
+  color: #718096;
+  margin: 0;
+}
+
+/* Estilo de las tarjetas */
+.preference-card {
+  margin-bottom: 1.5rem;
+  border-radius: 16px;
+  /* Fallback para navegadores que no soportan backdrop-filter */
+  background: var(--card-bg);
+  /* Asegura compatibilidad con Safari y otros navegadores */
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.preference-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--shadow);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  margin-bottom: 1rem;
+}
+
+.title-icon {
+  color: var(--primary-color);
+}
+
+/* Contenido dentro de las tarjetas */
+mat-card-content {
+  padding: 1.5rem;
+}
+
+.preference-item {
+  padding: 1rem 0;
+}
+
+.preference-description {
+  font-size: 0.875rem;
+  color: #718096;
+  margin-top: 0.5rem;
+}
+
+/* --- NUEVOS ESTILOS PARA TU BOTÓN --- */
+
+/* Contenedor para alinear el botón y la descripción */
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Espacio entre el botón y el texto */
+}
+
+/* 🌙 Toggle de tema (Tus estilos, modificados para que no sean 'fixed') */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.theme-toggle button {
+  background-color: var(--card-bg);
+  color: var(--primary-color);
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px var(--shadow);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  /* Estilos de glassmorphism */
+  background-color: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.theme-toggle button:hover {
+  transform: scale(1.1);
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+/* Ajusta el color del ícono en modo dark (si es necesario) */
+.theme-toggle button mat-icon {
+  transition: color 0.3s ease;
+}
+
+/* --- FIN DE NUEVOS ESTILOS --- */
+
+
+/* Estilos para el selector de idioma */
+.language-select {
+  max-width: 300px;
+}
+/* Descripción para el selector de idioma */
+.language-select + .preference-description {
+  margin-left: 1.5rem;
+}
+
+
+/* Grupo de botones */
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-start;
+}
+
+.button-group button {
+  padding: 0.75rem 1.75rem;
+  border-radius: 10px;
+  font-weight: 500;
+}

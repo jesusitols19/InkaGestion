@@ -1,1 +1,71 @@
-<p>preferences works!</p>
+<div class="preferences-container">
+  <div class="preferences-header">
+    <h1 class="header-title">Preferencias</h1>
+    <p class="header-subtitle">Personaliza la apariencia y el comportamiento de la aplicación.</p>
+  </div>
+
+  <form [formGroup]="preferencesForm" (ngSubmit)="onSubmit()">
+    <!-- Tarjeta para Apariencia -->
+    <mat-card class="preference-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">palette</mat-icon>
+          Apariencia
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Tu nuevo toggle de tema -->
+        <div class="preference-item">
+          <div class="theme-toggle-container">
+            <div class="theme-toggle">
+              <button type="button" (click)="toggleTheme()" [class.dark]="isDarkMode">
+                <!-- Usando mat-icon para consistencia con el proyecto -->
+                <mat-icon>{{ isDarkMode ? 'dark_mode' : 'light_mode' }}</mat-icon>
+              </button>
+            </div>
+            <p class="preference-description">
+              Actualmente en modo <strong>{{ isDarkMode ? 'Oscuro' : 'Claro' }}</strong>
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tarjeta para Localización -->
+    <mat-card class="preference-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">language</mat-icon>
+          Idioma y Región
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Selector de Idioma -->
+        <div class="preference-item">
+          <mat-form-field appearance="outline" class="language-select">
+            <mat-label>Idioma</mat-label>
+            <mat-select formControlName="language">
+              <mat-option value="es">Español</mat-option>
+              <mat-option value="en">Inglés</mat-option>
+              <mat-option value="pt">Portugués</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <p class="preference-description">Selecciona el idioma de la interfaz de usuario.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Botones de Acción -->
+    <div class="button-group">
+      <button mat-raised-button color="primary" type="submit">
+        <mat-icon>save</mat-icon>
+        Guardar Preferencias
+      </button>
+      <button mat-stroked-button type="button" (click)="onCancel()">
+        <mat-icon>cancel</mat-icon>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
+

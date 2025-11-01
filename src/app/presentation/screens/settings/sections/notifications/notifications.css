@@ -1,0 +1,141 @@
+/* Contenedor principal con animación */
+.notifications-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Encabezado de la sección */
+.notifications-header {
+  margin-bottom: 2.5rem;
+}
+
+.header-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  margin: 0 0 0.5rem 0;
+}
+
+.header-subtitle {
+  font-size: 0.95rem;
+  color: #718096; /* Color gris suave */
+  margin: 0;
+}
+
+/* Estilo de las tarjetas */
+.notification-card {
+  margin-bottom: 1.5rem;
+  border-radius: 16px;
+  background: var(--card-bg); /* Fondo con efecto glass */
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: all 0.3s ease;
+}
+
+
+
+.notification-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--shadow);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  /* Ajuste para eliminar padding extra si mat-card-header lo añade */
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Asegurar padding en el header si no lo tiene por defecto */
+mat-card-header {
+  padding: 1.5rem 1.5rem 1rem 1.5rem; /* Ajusta padding según necesites */
+  border-bottom: 1px solid var(--border-color); /* Línea divisoria sutil */
+}
+
+.title-icon {
+  color: var(--primary-color);
+}
+
+/* Contenido dentro de las tarjetas */
+mat-card-content {
+  padding: 1rem 1.5rem 1.5rem 1.5rem; /* Padding ajustado */
+}
+
+/* Estilo de cada item de notificación */
+.notification-item {
+  padding: 1.25rem 0; /* Espaciado vertical */
+  display: flex; /* Para alinear el toggle/checkbox y la descripción */
+  flex-direction: column; /* Apilar control y descripción */
+  gap: 0.5rem; /* Espacio entre control y descripción */
+}
+
+/* Descripción de la notificación */
+.notification-description {
+  font-size: 0.875rem;
+  color: #718096; /* Gris suave */
+  margin: 0;
+  padding-left: 2px; /* Pequeña indentación */
+  line-height: 1.5;
+}
+
+/* Separador entre items */
+mat-divider {
+  margin: 0; /* Eliminar margen si lo tuviera por defecto */
+  border-top-color: var(--border-color); /* Color del borde sutil */
+}
+
+/* Ajustes específicos para slide-toggle y checkbox */
+mat-slide-toggle, mat-checkbox {
+  margin-bottom: 0.5rem;
+}
+
+/* Grupo de botones */
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-start; /* Alinea a la izquierda */
+}
+
+.button-group button {
+  padding: 0.75rem 1.75rem;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* Estilos adicionales para modo oscuro si es necesario */
+body.dark-theme .notifications-container {
+  .header-title, .card-title {
+    color: var(--white); /* Texto blanco en modo oscuro */
+  }
+  .header-subtitle, .notification-description {
+    color: rgba(255, 255, 255, 0.7); /* Gris claro */
+  }
+  .notification-card {
+    background: var(--card-bg); /* Fondo oscuro con efecto glass */
+    border-color: var(--border-color); /* Borde más claro */
+  }
+   mat-card-header, mat-divider {
+     border-color: rgba(255, 255, 255, 0.2); /* Borde/divisor más claro */
+   }
+}

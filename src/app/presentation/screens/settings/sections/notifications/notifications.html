@@ -1,1 +1,96 @@
-<p>notifications works!</p>
+<div class="notifications-container">
+  <div class="notifications-header">
+    <h1 class="header-title">Notificaciones</h1>
+    <p class="header-subtitle">Gestiona cómo y cuándo recibes notificaciones.</p>
+  </div>
+
+  <form [formGroup]="notificationsForm" (ngSubmit)="onSubmit()">
+
+    <!-- Tarjeta para Notificaciones por Email -->
+    <mat-card class="notification-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">email</mat-icon>
+          Notificaciones por Correo Electrónico
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="notification-item">
+          <mat-slide-toggle formControlName="emailPlanillas">
+            Nuevas Planillas Generadas
+          </mat-slide-toggle>
+          <p class="notification-description">Recibe un correo cuando se genere una nueva planilla de pagos.</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="notification-item">
+          <mat-slide-toggle formControlName="emailReportes">
+            Reportes Semanales/Mensuales
+          </mat-slide-toggle>
+          <p class="notification-description">Notificación cuando los reportes periódicos estén disponibles.</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="notification-item">
+          <mat-slide-toggle formControlName="emailAlertasSistema">
+            Alertas Importantes del Sistema
+          </mat-slide-toggle>
+          <p class="notification-description">Alertas críticas sobre el estado del sistema o seguridad.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tarjeta para Notificaciones Push (Ejemplo) -->
+    <mat-card class="notification-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">notifications_active</mat-icon>
+          Notificaciones Push (Móvil/Web)
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="notification-item">
+          <mat-checkbox formControlName="pushAsistencia">
+            Confirmación de Asistencia
+          </mat-checkbox>
+          <p class="notification-description">Recibe una notificación push al marcar entrada o salida.</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="notification-item">
+          <mat-checkbox formControlName="pushPagos">
+            Confirmación de Pagos
+          </mat-checkbox>
+          <p class="notification-description">Notificación cuando se procese un pago a tu cuenta.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+     <!-- Tarjeta para Notificaciones SMS (Ejemplo) -->
+    <mat-card class="notification-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">
+          <mat-icon class="title-icon">sms</mat-icon>
+          Notificaciones por SMS
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="notification-item">
+          <mat-slide-toggle formControlName="smsRecordatorios">
+            Recordatorios de Jornada
+          </mat-slide-toggle>
+          <p class="notification-description">Recibe un SMS como recordatorio antes del inicio de tu jornada (si aplica).</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Botones de Acción -->
+    <div class="button-group">
+      <button mat-raised-button color="primary" type="submit">
+        <mat-icon>save</mat-icon>
+        Guardar Cambios
+      </button>
+      <button mat-stroked-button type="button" (click)="onCancel()">
+        <mat-icon>cancel</mat-icon>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

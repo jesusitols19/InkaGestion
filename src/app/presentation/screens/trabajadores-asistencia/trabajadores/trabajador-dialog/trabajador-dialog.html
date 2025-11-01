@@ -1,0 +1,76 @@
+<!-- Título del Diálogo -->
+<h2 mat-dialog-title class="text-center">{{ titulo }}</h2>
+
+<!-- Contenido del Diálogo (tu formulario) -->
+<mat-dialog-content>
+  <div class="container-fluid">
+    <form [formGroup]="trabajadorForm" class="row g-3">
+      <!-- Usamos las mismas clases de Bootstrap para mantener tu diseño -->
+      <div class="col-md-6">
+        <label class="form-label">Número trabajador:</label>
+        <input type="text" class="form-control form-control-sm" formControlName="employee_number" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Nombre:</label>
+        <input type="text" class="form-control form-control-sm" formControlName="nombre" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Documento:</label>
+        <input type="text" class="form-control form-control-sm" formControlName="documento" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Correo:</label>
+        <input type="email" class="form-control form-control-sm" formControlName="correo" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Teléfono:</label>
+        <input type="text" class="form-control form-control-sm" formControlName="telefono" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Tipo de contrato:</label>
+        <select class="form-select form-select-sm" formControlName="contract_type">
+          <option value="Full-Time">Full-Time</option>
+          <option value="Part-Time">Part-Time</option>
+          <option value="Temporal">Temporal</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Salario base:</label>
+        <input type="number" class="form-control form-control-sm" formControlName="salary_base" />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Cuenta bancaria:</label>
+        <input type="text" class="form-control form-control-sm" formControlName="bank_account" />
+      </div>
+
+      <div class="col-md-12">
+        <label class="form-label">Área (solo lectura):</label>
+        <!--
+          Nota: Este campo es 'readonly' y 'required'.
+          Asegúrate de que la lógica de negocio le asigne un valor
+          al crear, o considera quitar el 'Validators.required' si puede ir nulo.
+        -->
+        <input type="number" class="form-control form-control-sm" formControlName="area_id" readonly />
+      </div>
+    </form>
+  </div>
+</mat-dialog-content>
+
+<!-- Acciones del Diálogo (Botones) -->
+<mat-dialog-actions align="center" class="mt-3">
+  <button mat-stroked-button color="warn" (click)="onCancel()" class="me-2">
+    <mat-icon>cancel</mat-icon>
+    Cancelar
+  </button>
+  <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="trabajadorForm.invalid">
+    <mat-icon>save</mat-icon>
+    {{ editingTrabajadorId ? 'Actualizar' : 'Guardar' }}
+  </button>
+</mat-dialog-actions>

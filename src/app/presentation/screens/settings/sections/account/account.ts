@@ -21,14 +21,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 export class Account implements OnInit{
 
   profileForm!: FormGroup;
-  passwordForm!: FormGroup;
-  
-  hideCurrentPassword = true;
-  hideNewPassword = true;
-  hideConfirmPassword = true;
-  
   isEditingProfile = false;
-  isChangingPassword = false;
+
   
   // Simulación de datos del usuario actual
 currentUser = {
@@ -64,36 +58,10 @@ currentUser = {
       ]
     });
 
-    // Formulario de contraseña
-    this.passwordForm = this.fb.group({
-      currentPassword: ['', [Validators.required, Validators.minLength(6)]],
-      newPassword: ['', [Validators.required, Validators.minLength(8), this.passwordStrengthValidator]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
   }
 
-  // Validador personalizado para contraseñas seguras
-  passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
-    const value = control.value;
-    if (!value) return null;
 
-    const hasUpperCase = /[A-Z]/.test(value);
-    const hasLowerCase = /[a-z]/.test(value);
-    const hasNumeric = /[0-9]/.test(value);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
 
-    const valid = hasUpperCase && hasLowerCase && hasNumeric && hasSpecial;
-
-    return !valid ? { passwordStrength: true } : null;
-  }
-
-  // Validador para confirmar que las contraseñas coincidan
-  passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
-    const newPassword = group.get('newPassword')?.value;
-    const confirmPassword = group.get('confirmPassword')?.value;
-    
-    return newPassword === confirmPassword ? null : { passwordMismatch: true };
-  }
 
   toggleEditProfile(): void {
     this.isEditingProfile = !this.isEditingProfile;
@@ -119,47 +87,8 @@ currentUser = {
     }
   }
 
-  togglePasswordChange(): void {
-    this.isChangingPassword = !this.isChangingPassword;
-    
-    if (!this.isChangingPassword) {
-      this.passwordForm.reset();
-    }
-  }
 
-  onPasswordSubmit(): void {
-    if (this.passwordForm.valid) {
-      // Aquí iría la lógica de cambio de contraseña
-      // Por ejemplo: this.authService.changePassword(...)
-      
-      this.showSnackBar('✓ Contraseña actualizada correctamente', 'success');
-      this.passwordForm.reset();
-      this.isChangingPassword = false;
-    }
-  }
 
-  getPasswordStrength(): { strength: string; color: string; width: string } {
-    const password = this.passwordForm.get('newPassword')?.value || '';
-    
-    if (password.length === 0) {
-      return { strength: '', color: '', width: '0%' };
-    }
-    
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
-
-    if (strength <= 2) {
-      return { strength: 'Débil', color: '#f44336', width: '33%' };
-    } else if (strength <= 4) {
-      return { strength: 'Media', color: '#ff9800', width: '66%' };
-    } else {
-      return { strength: 'Fuerte', color: '#4caf50', width: '100%' };
-    }
-  }
 
   onFileSelected(event: any): void {
     const file = event.target.files[0];
@@ -183,53 +112,30 @@ currentUser = {
   }
 
   // Helpers para mensajes de error
-  getErrorMessage(formName: 'profile' | 'password', fieldName: string): string {
-    const form = formName === 'profile' ? this.profileForm : this.passwordForm;
-    const field = form.get(fieldName);
+  getErrorMessage(fieldName: string): string {
+    const field = this.profileForm.get(fieldName);
     
-    if (field?.hasError('required')) {
+    // No mostrar error si el campo no ha sido "tocado"
+    if (!field || !field.dirty) {
+      return '';
+    }
+
+    if (field.hasError('required')) {
       return 'Este campo es requerido';
     }
-    if (field?.hasError('email')) {
+    if (field.hasError('email')) {
       return 'Ingrese un correo válido';
     }
-    if (field?.hasError('minlength')) {
+    if (field.hasError('minlength')) {
       const minLength = field.errors?.['minlength'].requiredLength;
       return `Mínimo ${minLength} caracteres`;
     }
-    if (field?.hasError('passwordStrength')) {
-      return 'Debe contener mayúsculas, minúsculas, números y caracteres especiales';
-    }
-    if (field?.hasError('pattern')) {
+    if (field.hasError('pattern')) {
       return 'Formato inválido';
     }
     
     return '';
   }
 
-  // --- Métodos auxiliares para los requisitos de la contraseña en la plantilla ---
 
-  private get newPasswordValue(): string {
-    return this.passwordForm.get('newPassword')?.value || '';
-  }
-
-  hasMinLength(): boolean {
-    return this.newPasswordValue.length >= 8;
-  }
-
-  hasUpperCase(): boolean {
-    return /[A-Z]/.test(this.newPasswordValue);
-  }
-
-  hasLowerCase(): boolean {
-    return /[a-z]/.test(this.newPasswordValue);
-  }
-
-  hasNumeric(): boolean {
-    return /[0-9]/.test(this.newPasswordValue);
-  }
-
-  hasSpecialChar(): boolean {
-    return /[!@#$%^&*(),.?":{}|<>]/.test(this.newPasswordValue);
-  }
 }
