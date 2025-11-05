@@ -22,7 +22,7 @@ body {
     background: none;
     border-radius: 0;
     text-align: left;
-    font-size: 2.2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     box-shadow: none;
     transition: all 0.3s ease;
@@ -32,14 +32,14 @@ body {
 }
 
 .tituloI i {
-    font-size: 2rem;
+    font-size: 1rem;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .subtitle {
     color: rgba(255, 255, 255, 0.9);
     margin-top: 0.5rem;
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 500;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
@@ -85,7 +85,7 @@ body {
 /* ===== GRID DE ESTADÍSTICAS ===== */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 2fr));
+    grid-template-columns: 1fr;
     gap: 1rem;
     margin-bottom: 2.5rem;
     margin-right: 2rem;
@@ -174,7 +174,7 @@ body {
 }
 
 .stat-content h3 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 500;
     color: var(--dark-color);
     margin-bottom: 0.25rem;
@@ -800,7 +800,7 @@ body {
     }
     
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .field-workers {
@@ -1088,4 +1088,13 @@ button:focus,
         background: white !important;
         color: black !important;
     }
+}
+
+
+
+@media (min-width: 1200px) {
+  .stats-grid {
+    /* Mostramos las 4 columnas */
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
