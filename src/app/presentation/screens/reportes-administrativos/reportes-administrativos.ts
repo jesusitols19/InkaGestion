@@ -1,32 +1,100 @@
-import { Component } from '@angular/core';
-import { TableComponent } from '../../components/table-dinamic-component/table.component';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-reportes-administrativos',
-  imports: [TableComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './reportes-administrativos.html',
-  styleUrl: './reportes-administrativos.css'
+  styleUrls: ['./reportes-administrativos.css']
 })
-export class ReportesAdministrativos {
+export class ReportesAdministrativos implements OnInit {
 
-  usuarios = [
-    { nombre: 'Juan Pérez', rol: 'Administrador', descripcion: 'Encargado del sistema' },
-    { nombre: 'María López', rol: 'Usuario', descripcion: 'Accede a reportes básicos' },
-    { nombre: 'Carlos Gómez', rol: 'Supervisor', descripcion: 'Gestiona a los empleados' },
-    { nombre: 'Ana Torres', rol: 'Usuario', descripcion: 'Solicita servicios y genera tickets' },
-    { nombre: 'Luis Fernández', rol: 'Administrador', descripcion: 'Gestiona permisos y roles' },
-    { nombre: 'Victor Llanos', rol: 'Administrador', descripcion: 'Encargado del sistema' },
-    { nombre: 'Jean Terrones', rol: 'Usuario', descripcion: 'Accede a reportes básicos' },
-    { nombre: 'Lucero Vaca', rol: 'Supervisor', descripcion: 'Gestiona a los empleados' },
-    { nombre: 'Diego Fernando', rol: 'Usuario', descripcion: 'Solicita servicios y genera tickets' },
-  ];
-  planillas = [
-    { mes: 'Enero', total: 12500 },
-    { mes: 'Febrero', total: 9800 },
-    { mes: 'Marzo', total: 14300 },
-    { mes: 'Abril', total: 11200 },
-    { mes: 'Mayo', total: 15650 },
-  ];
+  apiUrl = 'http://localhost:8000';
+
+  reportes: any[] = [];
+  vistas: any[] = [];
+
+  modalAbierto = false;
+  modoEdicion = false;
+
+  nuevoReporte: any = {
+    id: null,
+    name: '',
+    frequency: 'MANUAL',
+    recipients: '',
+    template: '',
+    active: true,
+    created_by: null
+  };
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.obtenerReportes();
+    this.obtenerVistasMySQL();
+  }
+
+  obtenerReportes() {
+    this.http.get(`${this.apiUrl}/get-all-reports`).subscribe((res: any) => {
+      this.reportes = res.data || [];
+    });
+  }
+
+  obtenerVistasMySQL() {
+    this.http.get(`${this.apiUrl}/get-mysql-views`).subscribe((res: any) => {
+      this.vistas = res.data || [];
+    });
+  }
+
+  abrirModal(reporte: any = null) {
+    this.modalAbierto = true;
+    if (reporte) {
+      this.modoEdicion = true;
+      this.nuevoReporte = { ...reporte };
+    } else {
+      this.modoEdicion = false;
+      this.nuevoReporte = {
+        id: null,
+        name: '',
+        frequency: 'MANUAL',
+        recipients: '',
+        template: '',
+        active: true,
+        created_by: localStorage.getItem('id_usuario_actual') || null
+      };
+    }
+  }
+
+  cerrarModal() {
+    this.modalAbierto = false;
+  }
+
+  guardarReporte() {
+    const dto = { ...this.nuevoReporte };
+
+    if (this.modoEdicion) {
+      this.http.put(`${this.apiUrl}/update-scheduled-report`, dto).subscribe(() => {
+        this.cerrarModal();
+        this.obtenerReportes();
+      });
+    } else {
+      this.http.post(`${this.apiUrl}/create-scheduled-report`, dto).subscribe(() => {
+        this.cerrarModal();
+        this.obtenerReportes();
+      });
+    }
+  }
+
+  ejecutarManualmente() {
+    if (!confirm('¿Deseas ejecutar todos los reportes pendientes ahora?')) return;
+
+    this.http.post(`${this.apiUrl}/execute-manual`, {}).subscribe(() => {
+      alert('Reportes ejecutados correctamente.');
+    });
+  }
+
 
   
 }

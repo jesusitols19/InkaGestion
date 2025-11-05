@@ -1,17 +1,110 @@
-<!-- usuarios.component.html -->
-<app-material-table 
-  [data]="usuarios" 
-  [columns]="[
-    { field: 'nombre', header: 'Nombre' },
-    { field: 'rol', header: 'Rol' },
-    { field: 'descripcion', header: 'Descripción' }
-  ]">
-</app-material-table>
+<div class="container mt-4 mb-5">
+  <h2 class="text-center mb-4 text-primary fw-bold">📊 Administración de Reportes Programados</h2>
 
-<app-material-table 
-  [data]="planillas" 
-  [columns]="[
-    { field: 'mes', header: 'MES' },
-    { field: 'total', header: 'TOTAL' },
-  ]">
-</app-material-table>
+  <!-- ===================================== -->
+  <!-- ACCIONES SUPERIORES -->
+  <!-- ===================================== -->
+  <div class="d-flex justify-content-between mb-3">
+    <button class="btn btn-primary fw-semibold" (click)="abrirModal()">➕ Nuevo Reporte</button>
+    <button class="btn btn-success fw-semibold" (click)="ejecutarManualmente()">▶ Ejecutar Manualmente</button>
+  </div>
+
+  <!-- ===================================== -->
+  <!-- TABLA DE REPORTES -->
+  <!-- ===================================== -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white fw-semibold">
+      📄 Reportes Programados
+    </div>
+
+    <div class="card-body">
+      <table class="table table-hover align-middle">
+        <thead class="table-secondary">
+          <tr>
+            <th>ID</th>
+            <th>Nombre / Vista</th>
+            <th>Frecuencia</th>
+            <th>Última ejecución</th>
+            <th>Siguiente ejecución</th>
+            <th>Destinatarios</th>
+            <th>Activo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of reportes">
+            <td>{{ r.id }}</td>
+            <td>{{ r.name }}</td>
+            <td>{{ r.frequency }}</td>
+            <td>{{ r.last_run || '-' }}</td>
+            <td>{{ r.next_run || '-' }}</td>
+            <td>{{ r.recipients }}</td>
+            <td>
+              <span class="badge bg-{{ r.active ? 'success' : 'danger' }}">
+                {{ r.active ? 'Sí' : 'No' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-warning" (click)="abrirModal(r)">✏️ Editar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================================== -->
+  <!-- MODAL NUEVO / EDITAR REPORTE -->
+  <!-- ===================================== -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="modalAbierto">
+    <div class="modal-dialog">
+      <div class="modal-content p-3 border-0 shadow-lg">
+        <h5 class="modal-title mb-3 text-primary fw-bold">
+          {{ modoEdicion ? '✏️ Editar Reporte Programado' : '🆕 Nuevo Reporte Programado' }}
+        </h5>
+
+        <form (ngSubmit)="guardarReporte()">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Reporte:</label>
+            <select class="form-select" [(ngModel)]="nuevoReporte.name" name="name" required>
+              <option value="">-- Seleccione una vista --</option>
+              <option *ngFor="let v of vistas" [value]="v.name">{{ v.name }}</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Frecuencia</label>
+            <select class="form-select" [(ngModel)]="nuevoReporte.frequency" name="frequency">
+              <option value="DAILY">Diario</option>
+              <option value="WEEKLY">Semanal</option>
+              <option value="MONTHLY">Mensual</option>
+              <option value="MANUAL">Manual</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Destinatarios (emails separados por coma)</label>
+            <input type="text" class="form-control" [(ngModel)]="nuevoReporte.recipients" name="recipients" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Template (opcional)</label>
+            <input type="text" class="form-control" [(ngModel)]="nuevoReporte.template" name="template" />
+          </div>
+
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="nuevoReporte.active" name="active" id="activoChk" />
+            <label class="form-check-label" for="activoChk">Activo</label>
+          </div>
+
+          <div class="text-end">
+            <button type="submit" class="btn btn-success me-2 fw-semibold">
+              {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary fw-semibold" (click)="cerrarModal()">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
