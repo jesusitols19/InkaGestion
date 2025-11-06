@@ -20,9 +20,11 @@ export class ReportesAdministrativos implements OnInit {
   modoEdicion = false;
 
   nuevoReporte: any = {
-    id: null,
+    id: 0,
     name: '',
     frequency: 'MANUAL',
+    last_run: '',
+    next_run: '', // <-- nuevo campo
     recipients: '',
     template: '',
     active: true,
@@ -52,16 +54,24 @@ export class ReportesAdministrativos implements OnInit {
     this.modalAbierto = true;
     if (reporte) {
       this.modoEdicion = true;
-      this.nuevoReporte = { ...reporte };
+      this.nuevoReporte.id = reporte.id
+      this.nuevoReporte.name = reporte.name;
+      this.nuevoReporte.frequency = reporte.frequency;
+      this.nuevoReporte.next_run = reporte.next_run;
+      this.nuevoReporte.recipients = reporte.recipients;
+      this.nuevoReporte.template = reporte.template;
+      this.nuevoReporte.active = reporte.active;
+      this.nuevoReporte.created_by = reporte.created_by;
+      this.nuevoReporte.last_run = reporte.last_run;
+
     } else {
       this.modoEdicion = false;
       this.nuevoReporte = {
-        id: null,
         name: '',
         frequency: 'MANUAL',
+        next_run: new Date().toISOString().substring(0, 16), // formato para input datetime-local
         recipients: '',
         template: '',
-        active: true,
         created_by: localStorage.getItem('id_usuario_actual') || null
       };
     }
@@ -73,6 +83,8 @@ export class ReportesAdministrativos implements OnInit {
 
   guardarReporte() {
     const dto = { ...this.nuevoReporte };
+
+    console.log(dto);
 
     if (this.modoEdicion) {
       this.http.put(`${this.apiUrl}/update-scheduled-report`, dto).subscribe(() => {
@@ -91,6 +103,7 @@ export class ReportesAdministrativos implements OnInit {
     if (!confirm('¿Deseas ejecutar todos los reportes pendientes ahora?')) return;
 
     this.http.post(`${this.apiUrl}/execute-manual`, {}).subscribe(() => {
+      this.obtenerReportes();
       alert('Reportes ejecutados correctamente.');
     });
   }

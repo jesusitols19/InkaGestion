@@ -36,8 +36,9 @@
             <td>{{ r.id }}</td>
             <td>{{ r.name }}</td>
             <td>{{ r.frequency }}</td>
-            <td>{{ r.last_run || '-' }}</td>
-            <td>{{ r.next_run || '-' }}</td>
+            <td>{{ r.last_run ? (r.last_run | date:'dd/MM/yyyy, HH:mm') : '-' }}</td>
+            <td>{{ r.next_run ? (r.next_run | date:'dd/MM/yyyy, HH:mm') : '-' }}</td>
+
             <td>{{ r.recipients }}</td>
             <td>
               <span class="badge bg-{{ r.active ? 'success' : 'danger' }}">
@@ -83,6 +84,17 @@
           </div>
 
           <div class="mb-3">
+            <label class="form-label fw-semibold">📅 Fecha y hora de ejecución</label>
+            <input
+              type="datetime-local"
+              class="form-control"
+              [(ngModel)]="nuevoReporte.next_run"
+              name="next_run"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
             <label class="form-label fw-semibold">Destinatarios (emails separados por coma)</label>
             <input type="text" class="form-control" [(ngModel)]="nuevoReporte.recipients" name="recipients" />
           </div>
@@ -92,7 +104,7 @@
             <input type="text" class="form-control" [(ngModel)]="nuevoReporte.template" name="template" />
           </div>
 
-          <div class="form-check mb-3">
+          <div [hidden]="!modoEdicion" class="form-check mb-3">
             <input class="form-check-input" type="checkbox" [(ngModel)]="nuevoReporte.active" name="active" id="activoChk" />
             <label class="form-check-label" for="activoChk">Activo</label>
           </div>
@@ -104,6 +116,7 @@
             <button type="button" class="btn btn-outline-secondary fw-semibold" (click)="cerrarModal()">Cancelar</button>
           </div>
         </form>
+
       </div>
     </div>
   </div>
