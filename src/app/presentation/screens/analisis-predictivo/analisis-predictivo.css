@@ -1,0 +1,61 @@
+/* :host aplica estilos a este componente.
+  Le decimos que use el fondo y color de texto de tu tema global.
+*/
+:host {
+  display: block;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh; /* Ocupa toda la altura */
+}
+
+/* Esta es nuestra clase personalizada para las mat-card.
+  Sobreescribimos los estilos de Material para que usen 
+  los fondos, bordes y sombras de TU TEMA.
+*/
+.ia-card {
+  /* ¡Usa el fondo de tarjeta de tu tema! */
+  background-color: var(--card-bg) !important; 
+  /* ¡Usa el color de texto de tu tema! */
+  color: var(--text-color) !important;
+  
+  /* Usa el borde y sombra de tu tema */
+  border: 1px solid var(--border-color);
+  border-radius: 16px !important; /* Bordes redondeados (como tu .tituloI) */
+  box-shadow: 0 4px 12px var(--shadow) !important;
+  
+  /* ¡Efecto "vivo" al pasar el mouse! */
+  transition: all 0.3s ease-in-out;
+}
+
+.ia-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 25px var(--shadow) !important;
+  /* Damos un brillo sutil con tu color primario */
+  border-color: var(--primary-color);
+}
+
+/* Ajustes finos para que el texto dentro de las tarjetas 
+  de Material herede el color de texto correcto.
+*/
+.ia-card mat-card-title,
+.ia-card mat-card-content,
+.ia-card mat-card-subtitle,
+.ia-card p,
+.ia-card li {
+  color: var(--text-color) !important;
+}
+
+.ia-card mat-card-title {
+  opacity: 1; /* Título bien visible */
+}
+
+.ia-card mat-card-subtitle,
+.ia-card p {
+  opacity: 0.9; /* Texto ligeramente más suave */
+}
+
+/* Hacemos los íconos un poco más grandes */
+.ia-card mat-icon {
+  height: auto !important;
+  width: auto !important;
+}
