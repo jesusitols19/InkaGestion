@@ -1,10 +1,41 @@
 <div class="p-6 md:p-8">
 
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+    <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+      
+      <button mat-flat-button 
+              color="warn" 
+              (click)="exportarPDF()" 
+              [disabled]="isGenerandoPDF">
+        <mat-icon>picture_as_pdf</mat-icon>
+        @if (isGenerandoPDF) {
+          <span>Generando...</span>
+        } @else {
+          <span>Exportar a PDF</span>
+        }
+      </button>
+
+      <a mat-flat-button 
+         color="primary" 
+         [href]="API_URL + '/api/v1/ia/exportar-predicciones-excel'"
+         download="Reporte_Predicciones_IA.xlsx">
+        <mat-icon>assessment</mat-icon>
+        <span>Exportar a Excel</span>
+      </a>
+    </div>
+  </div>
+
+  <p class="text-lg text-center md:text-left opacity-80 my-6 md:my-8">
+    Resultados generados por los modelos de Inteligencia Artificial del sistema.
+  </p>
+
+
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     
     @if (prediccionCostos$ | async; as pred) {
       
-      <mat-card class="ia-card">
+      <mat-card class="ia-card" id="card-prediccion">
         <mat-card-header class="flex items-center gap-4">
           <mat-icon class="text-[--primary-color] !text-4xl">insights</mat-icon>
           <div>
@@ -28,7 +59,7 @@
     }
 
     @if (patronesAdelantos$ | async; as patrones) {
-      <mat-card class="ia-card">
+      <mat-card class="ia-card" id="card-patrones">
         <mat-card-header class="flex items-center gap-4">
           <mat-icon class="text-[--secondary-color] !text-4xl">hub</mat-icon>
           <div>
