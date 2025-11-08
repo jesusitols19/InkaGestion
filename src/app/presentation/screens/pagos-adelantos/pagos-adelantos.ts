@@ -133,8 +133,7 @@ export class PagosAdelantos implements OnInit {
   }
 
   generarArchivoBanco(c: any) {
-    const fakePath = '/tmp/archivo_banco.csv';
-    this.http.put(`http://localhost:8000/generate-file_bank/${c.id}/${fakePath}`, {})
+    this.http.put(`http://localhost:8000/generate-file_bank/${c.id}`, {})
       .subscribe(() => this.cargarCorridas());
   }
 
