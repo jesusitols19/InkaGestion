@@ -13,12 +13,7 @@ body {
     line-height: 1.6;
 }
 
-:host {
-    display: block;
-    /* Usa un fondo más suave desde tu styles.css */
-    background-color: var(--primary-main, #FAFBFE);
-    padding: 1rem 2rem; /* Añade padding general */
-}
+
 
 .tituloI {
     font-family: 'Roboto', sans-serif;  
@@ -100,50 +95,78 @@ body {
 
 .stat-card {
     background: var(--white);
-    /* Borde más sutil */
-    border-radius: 16px; 
-    padding: 1.5rem;
-    /* Sombra mucho más suave */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    border: 1px solid transparent; 
+    gap: 1.5rem;
+    border: 1px solid rgba(15, 153, 128, 0.1);
 }
 
 .stat-card::before {
-    display: none;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 20px 20px 0 0;
 }
 
 .stat-card:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-soft);
-    border-color: var(--primary-color); /* Borde sutil al hacer hover */
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-medium);
+    border-color: rgba(15, 153, 128, 0.2);
+}
+
+.stat-card.primary::before {
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.stat-card.secondary::before {
+    background: linear-gradient(90deg, var(--secondary-color), var(--amber));
+}
+
+.stat-card.success::before {
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+}
+
+.stat-card.warning::before {
+    background: linear-gradient(90deg, var(--warning-color), var(--secondary-color));
 }
 
 .stat-icon {
-    /* Quitamos el fondo, el tamaño fijo y la sombra */
-    background: none;
-    box-shadow: none;
-    width: auto;
-    height: auto;
-    /* Hacemos el icono un poco más grande y le damos el color */
-    font-size: 1rem; 
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-hover));
+    box-shadow: 0 6px 20px rgba(15, 153, 128, 0.3);
     flex-shrink: 0;
 }
 
-.stat-card.primary .stat-icon {
-    color: var(--primary-color);
-}
-.stat-card.success .stat-icon {
-    color: var(--accent-color);
-}
-.stat-card.warning .stat-icon {
-    color: var(--warning-color);
-}
 .stat-card.secondary .stat-icon {
-    color: var(--secondary-color);
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-color-hover));
+    box-shadow: 0 6px 20px rgba(251, 192, 45, 0.3);
+}
+
+.stat-card.success .stat-icon {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-color-hover));
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+}
+
+.stat-card.warning .stat-icon {
+    background: linear-gradient(135deg, var(--warning-color), var(--secondary-color));
+    box-shadow: 0 6px 20px rgba(249, 168, 37, 0.3);
 }
 
 .stat-content {
@@ -151,35 +174,36 @@ body {
 }
 
 .stat-content h3 {
-    /* Reducimos el número */
-    font-size: 1.75rem; 
-    font-weight: 600; /* Un poco más de peso */
+    font-size: 1.5rem;
+    font-weight: 500;
     color: var(--dark-color);
+    margin-bottom: 0.25rem;
     line-height: 1.2;
-    margin-bottom: 0.15rem;
 }
 
 .stat-content p {
-    /* Reducimos el título y cambiamos el color */
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #6c757d; /* Un gris más suave */
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-color);
     margin-bottom: 0.25rem;
 }
 
 .stat-subtitle {
-    font-size: 0.85rem;
-    color: #999;
-    font-weight: 400;
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
 }
 
 .stat-trend {
-    position: static; /* Lo movemos al flujo normal */
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 25px;
     font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.2rem 0.6rem;
-    border-radius: 8px;
-    align-self: flex-start; /* Alinear con el contenido */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .stat-trend.positive {
@@ -191,7 +215,7 @@ body {
 /* ===== CONTENIDO PRINCIPAL ===== */
 .dashboard-content {
     display: grid;
-    grid-template-columns: 1fr; /* Móvil: 1 columna */
+    grid-template-columns: 2.2fr 1fr;
     gap: 2rem;
     margin-bottom: 2.5rem;
 }
@@ -199,32 +223,32 @@ body {
 /* ===== TARJETAS ===== */
 .card {
     background: var(--white);
-    border-radius: 16px; /* Mismo borde que las stat-cards */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra suave */
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
     overflow: hidden;
     margin-bottom: 2rem;
-    border: 1px solid transparent; /* Sin borde por defecto */
+    transition: all 0.3s ease;
+    border: 1px solid rgba(15, 153, 128, 0.1);
 }
 
 .card:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); /* Sombra suave al hover */
-    border-color: transparent;
+    box-shadow: var(--shadow-medium);
+    border-color: rgba(15, 153, 128, 0.2);
 }
 
 .card-header {
-    padding: 1.25rem 1.5rem; /* Padding más ajustado */
-    border-bottom: 1px solid #f0f0f0; /* Borde inferior más limpio */
+    padding: 1.75rem 2rem;
+    border-bottom: 2px solid #f8f9fa;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--white); /* Fondo blanco limpio, sin degradado */
+    background: linear-gradient(135deg, #fafbfe 0%, #f8f9fa 100%);
 }
 
 .card-header h3 {
-    /* Tipografía del título de la tarjeta más pequeña */
     color: var(--dark-color);
-    font-size: 1.15rem; 
-    font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -232,7 +256,7 @@ body {
 
 .card-header i {
     color: var(--primary-color);
-    font-size: 1.1rem; /* Icono del título más pequeño */
+    font-size: 1.3rem;
 }
 
 /* ===== BADGES ===== */
