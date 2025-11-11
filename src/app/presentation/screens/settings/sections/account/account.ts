@@ -1,8 +1,6 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors  } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
@@ -11,61 +9,77 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { environment } from '../../../../../../environments/environments';
 
 @Component({
   selector: 'app-account',
-  imports: [CommonModule, ReactiveFormsModule,HttpClientModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSnackBarModule
+  ],
   templateUrl: './account.html',
-  styleUrl: './account.css'
+  styleUrls: ['./account.css']
 })
-export class Account implements OnInit{
-
+export class Account implements OnInit {
   profileForm!: FormGroup;
   isEditingProfile = false;
-
-  
-  // Simulación de datos del usuario actual
-currentUser = {
-    nombre: 'Arturo Pérez',
-    correo: 'arturo.perez@ejemplo.com',
-    telefono: '+51 987 654 321',
-    avatar: 'https://ui-avatars.com/api/?name=Arturo+Pérez&size=200&background=667eea&color=fff'
-  };
+  currentUser: any = {};
+  userId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
+    this.userId = localStorage.getItem('id_usuario_actual');
     this.initializeForms();
+    if (this.userId) {
+      this.loadUserProfile(this.userId);
+    }
   }
 
   initializeForms(): void {
-    // Formulario de perfil
     this.profileForm = this.fb.group({
       nombre: [
-        { value: this.currentUser.nombre, disabled: true },
+        { value: '', disabled: true },
         [Validators.required, Validators.minLength(3)]
       ],
       correo: [
-        { value: this.currentUser.correo, disabled: true },
+        { value: '', disabled: true },
         [Validators.required, Validators.email]
-      ],
-      telefono: [
-        { value: this.currentUser.telefono, disabled: true },
-        [Validators.pattern(/^[+]?[\d\s-()]+$/)]
       ]
     });
-
   }
 
-
-
+  loadUserProfile(userId: string): void {
+    this.http.get<any>(`${environment.apiUrl}/get-user-by-id/${userId}`).subscribe({
+      next: (response) => {
+        if (response.status === 'success') {
+          this.currentUser = response.data;
+          this.currentUser.avatar = `https://ui-avatars.com/api/?name=${this.currentUser.nombre.replace(' ', '+')}&size=200&background=667eea&color=fff`;
+          this.profileForm.patchValue({
+            nombre: this.currentUser.nombre,
+            correo: this.currentUser.correo
+          });
+        }
+      },
+      error: () => {
+        this.showSnackBar('Error al cargar los datos del usuario', 'error');
+      }
+    });
+  }
 
   toggleEditProfile(): void {
     this.isEditingProfile = !this.isEditingProfile;
-    
     if (this.isEditingProfile) {
       this.profileForm.enable();
     } else {
@@ -75,20 +89,21 @@ currentUser = {
   }
 
   onProfileSubmit(): void {
-    if (this.profileForm.valid) {
+    if (this.profileForm.valid && this.userId) {
       const updatedData = this.profileForm.getRawValue();
-      
-      // Simulación de actualización
-      this.currentUser = { ...this.currentUser, ...updatedData };
-      
-      this.showSnackBar('✓ Perfil actualizado correctamente', 'success');
-      this.isEditingProfile = false;
-      this.profileForm.disable();
+      this.http.put(`${environment.apiUrl}/update-user/${this.userId}`, updatedData).subscribe({
+        next: () => {
+          this.currentUser = { ...this.currentUser, ...updatedData };
+          this.showSnackBar('✓ Perfil actualizado correctamente', 'success');
+          this.isEditingProfile = false;
+          this.profileForm.disable();
+        },
+        error: () => {
+          this.showSnackBar('Error al actualizar el perfil', 'error');
+        }
+      });
     }
   }
-
-
-
 
   onFileSelected(event: any): void {
     const file = event.target.files[0];
@@ -111,15 +126,11 @@ currentUser = {
     });
   }
 
-  // Helpers para mensajes de error
   getErrorMessage(fieldName: string): string {
     const field = this.profileForm.get(fieldName);
-    
-    // No mostrar error si el campo no ha sido "tocado"
     if (!field || !field.dirty) {
       return '';
     }
-
     if (field.hasError('required')) {
       return 'Este campo es requerido';
     }
@@ -130,12 +141,6 @@ currentUser = {
       const minLength = field.errors?.['minlength'].requiredLength;
       return `Mínimo ${minLength} caracteres`;
     }
-    if (field.hasError('pattern')) {
-      return 'Formato inválido';
-    }
-    
     return '';
   }
-
-
 }

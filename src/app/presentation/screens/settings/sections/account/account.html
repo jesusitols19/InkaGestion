@@ -77,19 +77,6 @@
             </mat-form-field>
           </div>
 
-          <div class="form-row">
-            <mat-form-field appearance="fill" class="full-width">
-              <mat-label>Teléfono</mat-label>
-              <input 
-                matInput 
-                formControlName="telefono" 
-                placeholder="+51 987 654 321">
-              <mat-icon matPrefix>phone</mat-icon>
-              @if (profileForm.get('telefono')?.invalid) {
-                <mat-error>{{ getErrorMessage('telefono') }}</mat-error>
-              }
-            </mat-form-field>
-          </div>
 
           <div class="button-group">
             @if (isEditingProfile) {
