@@ -1,0 +1,23 @@
+<h2 mat-dialog-title class="flex items-center">
+  @if (data.confirmColor === 'warn') {
+    <mat-icon color="warn" class="mr-2">warning</mat-icon>
+  } @else {
+    <mat-icon color="primary" class="mr-2">help_outline</mat-icon>
+  }
+  {{ data.title }}
+</h2>
+
+<mat-dialog-content>
+  <p class="text-gray-600">{{ data.message }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onDismiss()">Cancelar</button>
+  
+  <button 
+    mat-raised-button 
+    [color]="data.confirmColor" 
+    (click)="onConfirm()">
+    {{ data.confirmText || 'Aceptar' }}
+  </button>
+</mat-dialog-actions>

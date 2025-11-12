@@ -1,50 +1,122 @@
-<div class="container my-5">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="fw-bold"><i class="bi bi-people-fill me-2"></i>Usuarios Registrados</h3>
-    <button mat-flat-button color="primary" (click)="abrirModalNuevoUsuario()">
-      <i class="bi bi-person-plus me-1"></i> Agregar Usuario
+<div class="container mx-auto p-6">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Gestión de Usuarios</h1>
+      <p class="text-gray-600">Administra los accesos y roles del sistema</p>
+    </div>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="abrirModalNuevoUsuario()">
+      <mat-icon>add</mat-icon>
+      Nuevo Usuario
     </button>
   </div>
 
-  <mat-card>
-    <mat-card-content>
-      <div class="table-responsive">
-        <table mat-table [dataSource]="usuarios" class="mat-elevation-z2 w-100">
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Nombre
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Correo
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Rol
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Estado
+            </th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          
+          @for (usuario of usuarios; track usuario.id) {
+            <tr class="hover:bg-gray-50 transition-colors duration-150">
+              
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
+                    {{ usuario.nombre.charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">{{ usuario.nombre }}</div>
+                  </div>
+                </div>
+              </td>
 
-          <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef>ID</th>
-            <td mat-cell *matCellDef="let u">{{ u.id }}</td>
-          </ng-container>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-500">{{ usuario.correo }}</div>
+              </td>
 
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef>Nombre</th>
-            <td mat-cell *matCellDef="let u">{{ u.nombre }}</td>
-          </ng-container>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                  {{ usuario.role_name }}
+                </span>
+              </td>
 
-          <ng-container matColumnDef="correo">
-            <th mat-header-cell *matHeaderCellDef>Correo</th>
-            <td mat-cell *matCellDef="let u">{{ u.correo }}</td>
-          </ng-container>
+              <td class="px-6 py-4 whitespace-nowrap">
+                @if (usuario.active) {
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    Activo
+                  </span>
+                } @else {
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                    Inactivo
+                  </span>
+                }
+              </td>
 
-          <ng-container matColumnDef="rol">
-            <th mat-header-cell *matHeaderCellDef>Rol</th>
-            <td mat-cell *matCellDef="let u">{{ u.role_name }}</td>
-          </ng-container>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                
+                <button 
+                  mat-icon-button 
+                  color="primary" 
+                  (click)="abrirModalEditarUsuario(usuario)"
+                  matTooltip="Editar usuario">
+                  <mat-icon>edit</mat-icon>
+                </button>
 
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let u">
-              <button mat-icon-button color="accent" (click)="abrirModalEditarUsuario(u)">
-                <mat-icon>edit</mat-icon>
-              </button>
-            </td>
-          </ng-container>
+                @if (usuario.active) {
+                  <button 
+                    mat-icon-button 
+                    color="warn" 
+                    (click)="eliminarUsuario(usuario.id)"
+                    matTooltip="Desactivar usuario">
+                    <mat-icon>block</mat-icon>
+                  </button>
+                } @else {
+                  <button 
+                    mat-icon-button 
+                    class="text-green-600"
+                    (click)="activarUsuario(usuario.id)"
+                    matTooltip="Activar usuario">
+                    <mat-icon>check_circle</mat-icon>
+                  </button>
+                }
 
-          <tr mat-header-row *matHeaderRowDef="['id','nombre','correo','rol','acciones']"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['id','nombre','correo','rol','acciones'];"></tr>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                @if (isLoading) {
+                  <p>Cargando usuarios...</p>
+                } @else {
+                  <p>No se encontraron usuarios registrados.</p>
+                }
+              </td>
+            </tr>
+          }
 
-        </table>
-      </div>
-    </mat-card-content>
-  </mat-card>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
