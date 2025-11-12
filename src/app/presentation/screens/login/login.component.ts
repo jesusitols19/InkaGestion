@@ -5,11 +5,11 @@ import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environments';
 import { CommonModule } from '@angular/common';
 import { PasswordModule } from 'primeng/password';
-
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule,HttpClientModule, PasswordModule],
+  imports: [CommonModule, ReactiveFormsModule,HttpClientModule, PasswordModule, MatSnackBarModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -19,14 +19,16 @@ export class LoginComponent {
   isDarkMode = false;
   isDevelopmentMode = false; // Cambiar a false cuando uses la BD real
 
-  constructor(
+  errorMessage: string | null = null;
+  constructor(    
     private fb: FormBuilder,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
       CORREO: ['', Validators.required],
-      CONTRASENIA: ['', Validators.required]
+      CONTRASENIA: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
@@ -42,6 +44,7 @@ toggleTheme() {
 }
 
 onSubmit() {
+  this.errorMessage = null;
   if (this.loginForm.valid) {
     const { CORREO, CONTRASENIA } = this.loginForm.value;
 
@@ -80,30 +83,49 @@ private loginDevelopment(email: string, password: string) {
 }
 
 private loginProduction(email: string, password: string) {
-  const body = {
-    email: email,
-    password: password
-  };
+    const body = {
+      email: email,
+      password: password
+    };
 
-  this.http.post<any>(`${environment.apiUrl}/login`, body).subscribe({
-    next: res => {
-      if(res.status === "success"){
-        console.log('✅ Login exitoso:', res);
-        // Guardar en localStorage
-        localStorage.setItem('id_usuario_actual', JSON.stringify(res.data.id));
-        localStorage.setItem('nombre_usuario_actual', JSON.stringify(res.data.nombre));
-        localStorage.setItem('correo_usuario_actual', JSON.stringify(res.data.correo));
-        this.router.navigate(['/dashboard']);
+    this.http.post<any>(`${environment.apiUrl}/login`, body).subscribe({
+      next: res => {
+        // Caso de éxito (El backend envió jsend_success)
+        if (res.status === "success") {
+          console.log('✅ Login exitoso:', res);
+          localStorage.setItem('id_usuario_actual', JSON.stringify(res.data.id));
+          localStorage.setItem('nombre_usuario_actual', JSON.stringify(res.data.nombre));
+          localStorage.setItem('correo_usuario_actual', JSON.stringify(res.data.correo));
+          this.router.navigate(['/dashboard']);
+        } 
+        // Caso de fallo lógico (El backend envió jsend_fail)
+        else {
+          // Obtenemos el mensaje de error de la respuesta 'jsend_fail'
+          const detail = res.data?.message || 'Credenciales incorrectas';
+          this.mostrarError(detail);
+        }
+      },
+      error: err => {
+        // Caso de error de RED o SERVIDOR (HTTP 4xx, 5xx)
+        // (Tu backend actual no usa esto para fallos de login, pero es bueno tenerlo)
+        console.error('❌ Error de red o servidor:', err);
+        const detail = err.error?.detail || 'Error de conexión. Intente más tarde.';
+        this.mostrarError(detail);
       }
-      else{
-        alert('Credenciales incorrectas');
-      }
-    },
-    error: err => {
-      console.error('❌ Error de login:', err);
-      alert('Credenciales incorrectas o error en el servidor');
-    }
-  });
-}
+    });
+  }
+
+  // 7. Función helper para mostrar notificaciones
+  private mostrarError(mensaje: string) {
+    this.errorMessage = mensaje; // Para mostrarlo en el HTML
+    
+    // Muestra una notificación (reemplaza el 'alert')
+    this.snackBar.open(mensaje, 'Cerrar', {
+      duration: 5000,
+      panelClass: ['bg-red-500', 'text-white'], // Clases de Tailwind para el error
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
+  }
 
 }

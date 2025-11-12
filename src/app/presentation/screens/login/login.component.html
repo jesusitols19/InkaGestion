@@ -53,6 +53,12 @@
 
       </div>
 
+      @if (errorMessage) {
+  <div class="p-3 my-2 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+    {{ errorMessage }}
+  </div>
+}
+
       <!-- Botón -->
       <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">
         Iniciar Sesión
