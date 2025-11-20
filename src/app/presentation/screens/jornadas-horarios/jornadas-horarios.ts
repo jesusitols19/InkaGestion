@@ -24,6 +24,8 @@ export class JornadasHorarios implements OnInit {
 
   apiBase = 'http://localhost:8000'; // ajusta según tu backend FastAPI
 
+  employees: any[] = [];
+
   // ===== TURNOS =====
   shifts: any[] = [];
   newShift: any = {
@@ -49,6 +51,7 @@ export class JornadasHorarios implements OnInit {
   ngOnInit(): void {
     this.loadShifts();
     this.loadEmployeeShifts();
+    this.loadEmployees();
   }
 
   // === Turnos ===
@@ -88,5 +91,13 @@ export class JornadasHorarios implements OnInit {
       this.newEmployeeShift = { employee_id: '', shift_id: '', start_date: '', end_date: '' };
       this.loadEmployeeShifts();
     });
+  }
+
+  loadEmployees(){
+
+    this.http.get(`${this.apiBase}/list-employees`).subscribe((res: any) => {
+      this.employees = res.data || [];
+    });
+
   }
 }
