@@ -15,6 +15,8 @@ export class PagosAdelantos implements OnInit {
   adelantos: any[] = [];
   corridas: any[] = [];
 
+  employees: any[] = [];
+
   formAdelanto: FormGroup;
   formItem: FormGroup;
 
@@ -42,6 +44,7 @@ export class PagosAdelantos implements OnInit {
   ngOnInit() {
     this.cargarAdelantos();
     this.cargarCorridas();
+    this.loadEmployees();
   }
 
   // ================= ADELANTOS =================
@@ -146,5 +149,13 @@ export class PagosAdelantos implements OnInit {
     return status === 'PROCESSED' ? 'success'
          : status === 'FAILED' ? 'danger'
          : 'warning';
+  }
+
+  loadEmployees(){
+
+    this.http.get('http://localhost:8000/list-employees').subscribe((res: any) => {
+      this.employees = res.data || [];
+    });
+
   }
 }

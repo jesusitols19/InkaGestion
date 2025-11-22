@@ -13,6 +13,7 @@ import { environment } from '../../../../environments/environments';
 })
 export class AdministracionPlanilla implements OnInit{
   
+  employees: any[] = [];
 
   // === Periodos ===
   periodos: any[] = [];
@@ -42,6 +43,7 @@ export class AdministracionPlanilla implements OnInit{
   ngOnInit() {
     this.cargarPeriodos();
     this.cargarPlanillas();
+    this.loadEmployees();
   }
 
   // ================= PERIODOS =================
@@ -132,6 +134,55 @@ export class AdministracionPlanilla implements OnInit{
 
   cerrarModalPlanilla() {
     this.mostrarModalPlanilla = false;
+  }
+
+  exportarExcel(planillaId: number) {
+
+    const url = `http://localhost:8000/export-excel-payroll/${planillaId}`;
+
+    this.http
+      .post(url, {}, { responseType: 'blob' })
+      .subscribe({
+        next: (response: Blob) => {
+          this.descargarArchivo(response, `planilla_${planillaId}.xlsx`);
+        },
+        error: (err) => {
+          console.error('Error al exportar Excel', err);
+        },
+      });
+  }
+
+  exportarPdf(planillaId: number) {
+
+    const url = `http://localhost:8000/export-pdf-payroll/${planillaId}`;
+    
+    this.http
+      .post(url, {}, { responseType: 'blob' })
+      .subscribe({
+        next: (response: Blob) => {
+          this.descargarArchivo(response, `planilla_${planillaId}.pdf`);
+        },
+        error: (err) => console.error('Error al exportar PDF', err),
+      });
+  }
+
+
+  private descargarArchivo(response: Blob, nombre: string) {
+    const blob = new Blob([response]);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombre;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  loadEmployees(){
+
+    this.http.get('http://localhost:8000/list-employees').subscribe((res: any) => {
+      this.employees = res.data || [];
+    });
+
   }
 
 

@@ -88,42 +88,81 @@ export class ControlAsistencia implements OnInit {
   }
 
   registrarEntrada() {
-    const payload = {
-      employee_id: this.empleado.id,
-      supervisor_user_id: 2,
-      justification: this.registro.justificacion || null
-    };
 
-    this.http.post(`${environment.apiUrl}/crear-asistencia`, payload).subscribe({
-      next: (response: any) => {
-        if (response.status === 'success') {
-          alert(response.data.message || 'Entrada registrada correctamente');
-          this.cargarAsistencias(this.empleado.id);
-          this.registro.justificacion = '';
-        } else {
-          alert(response.data.message);
-        }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        const payload = {
+          employee_id: this.empleado.id,
+          supervisor_user_id: localStorage.getItem('id_usuario_actual'),
+          justification: this.registro.justificacion || null,
+          lat: lat,
+          lng: lng,
+          // device_info: navigator.userAgent
+        };
+
+        this.http.post(`${environment.apiUrl}/crear-asistencia`, payload).subscribe({
+          next: (response: any) => {
+            if (response.status === 'success') {
+              alert(response.data.message || 'Entrada registrada correctamente');
+              this.cargarAsistencias(this.empleado.id);
+              this.registro.justificacion = '';
+            } else {
+              alert(response.data.message);
+            }
+          },
+          error: (err) => {
+            console.error(err);
+            alert('Error al registrar la asistencia');
+          }
+        });
+      },
+      (error) => {
+        console.error('Error de geolocalización:', error);
+        alert('No se pudo obtener la ubicación. Debes permitir el acceso a tu ubicación.');
       }
-    });
+    );
   }
 
   registrarSalida() {
-    const payload = {
-      employee_id: this.empleado.id,
-      supervisor_user_id: 7
-    };
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
 
-    this.http.post(`${environment.apiUrl}/finalizar-asistencia`, payload).subscribe({
-      next: (response: any) => {
-        if (response.status === 'success') {
-          alert(response.data.message || 'Salida registrada correctamente');
-          this.cargarAsistencias(this.empleado.id);
-          this.registro.justificacion = '';
-        } else {
-          alert(response.data.message);
-        }
+        const payload = {
+          employee_id: this.empleado.id,
+          supervisor_user_id: localStorage.getItem('id_usuario_actual'),
+          lat: lat,
+          lng: lng,
+          // device_info: navigator.userAgent
+        };
+
+
+        this.http.post(`${environment.apiUrl}/finalizar-asistencia`, payload).subscribe({
+          next: (response: any) => {
+            if (response.status === 'success') {
+              alert(response.data.message || 'Salida registrada correctamente');
+              this.cargarAsistencias(this.empleado.id);
+              this.registro.justificacion = '';
+            } else {
+              alert(response.data.message);
+            }
+          },
+          error: (err) => {
+            console.error(err);
+            alert('Error al registrar la asistencia');
+          }
+        });
+      },
+      (error) => {
+        console.error('Error de geolocalización:', error);
+        alert('No se pudo obtener la ubicación. Debes permitir el acceso a tu ubicación.');
       }
-    });
+    );
+
   }
 
 }
