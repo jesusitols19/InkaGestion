@@ -6,11 +6,16 @@ import Aura from '@primeng/themes/aura';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTableModule } from '@angular/material/table';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(withInterceptorsFromDi()),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
@@ -23,6 +28,13 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
-    importProvidersFrom(MatInputModule, MatFormFieldModule, MatTableModule)
+    importProvidersFrom(
+      MatInputModule, 
+      MatFormFieldModule, 
+      MatTableModule,
+      MatDatepickerModule,
+      MatNativeDateModule,
+      MatSelectModule
+    )
   ]
 };

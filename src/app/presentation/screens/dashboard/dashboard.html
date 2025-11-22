@@ -1,3 +1,51 @@
+<div class="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800">
+  
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 gap-4 md:grid-cols-5 md:items-end">
+
+    <mat-form-field appearance="fill" class="md:col-span-2">
+      <mat-label>Rango de Fechas</mat-label>
+      <mat-date-range-input [rangePicker]="picker">
+        <input matStartDate formControlName="startDate" placeholder="Fecha inicio">
+        <input matEndDate formControlName="endDate" placeholder="Fecha fin">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Filtrar por Área</mat-label>
+      <mat-select formControlName="areaId">
+        <mat-option [value]="null">Todas las Áreas</mat-option>
+        
+        @for (area of areas(); track area.id) {
+          <mat-option [value]="area.id">{{ area.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Filtrar por Trabajador</mat-label>
+      <mat-select formControlName="employeeId">
+        <mat-option [value]="null">Todos los Trabajadores</mat-option>
+        
+        @for (emp of employees(); track emp.id) {
+          <mat-option [value]="emp.id">{{ emp.nombres }} {{ emp.apellido_paterno }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="flex gap-2">
+      <button mat-raised-button color="primary" type="submit">
+        <i class="fas fa-filter mr-2"></i>
+        Aplicar
+      </button>
+      <button mat-button type="button" (click)="clearFilters()">
+        Limpiar
+      </button>
+    </div>
+  </form>
+</div>
+
 
 <!-- Estadísticas Principales -->
 <div class="stats-grid">
@@ -29,21 +77,6 @@
     </div>
   </div>
 
-  <!-- Ingresos del Mes -->
-  <!-- <div [class]="'stat-card secondary'">
-    <div class="stat-icon">
-      <i class="fas fa-dollar-sign"></i>
-    </div>
-    <div class="stat-content">
-      <h3>S/ {{ stats().ingresosMes | currency:'':'symbol':'1.2-2' }}</h3>
-      <p>Ingresos Marzo</p>
-      <span class="stat-subtitle">Ventas del mes</span>
-    </div>
-    <div [class]="'stat-trend positive'">
-      <i class="fas fa-arrow-up"></i>
-      +8.1%
-    </div>
-  </div> -->
 
   <!-- Pagos Pendientes -->
   <div [class]="'stat-card warning'">
