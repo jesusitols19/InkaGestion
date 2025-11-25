@@ -1,94 +1,150 @@
-<div class="p-6 md:p-8">
+<div class="ia-container fade-in">
 
-<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-    <div class="flex flex-col sm:flex-row gap-3 shrink-0">
-      
-      <button mat-flat-button 
-              color="warn" 
-              (click)="exportarPDF()" 
-              [disabled]="isGenerandoPDF">
-        <mat-icon>picture_as_pdf</mat-icon>
-        @if (isGenerandoPDF) {
-          <span>Generando...</span>
-        } @else {
-          <span>Exportar a PDF</span>
-        }
-      </button>
-
-      <a mat-flat-button 
-         color="primary" 
-         [href]="API_URL + '/api/v1/ia/exportar-predicciones-excel'"
-         download="Reporte_Predicciones_IA.xlsx">
-        <mat-icon>assessment</mat-icon>
-        <span>Exportar a Excel</span>
-      </a>
+  <!-- HEADER -->
+  <header class="ia-header">
+    <div class="header-content">
+      <h1><mat-icon>psychology</mat-icon> Análisis Predictivo (IA)</h1>
+      <p>Módulo de inteligencia artificial para proyección de costos y detección de patrones.</p>
     </div>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="exportarExcel()">
+        <mat-icon>description</mat-icon> Excel Completo
+      </button>
+      <button mat-raised-button color="accent" (click)="exportarPDF()" [disabled]="loading || isGenerandoPDF">
+        <mat-icon>picture_as_pdf</mat-icon> {{ isGenerandoPDF ? 'Generando...' : 'Reporte PDF' }}
+      </button>
+    </div>
+  </header>
+
+  <!-- ESTADO DE CARGA -->
+  @if (loading) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Entrenando modelos en tiempo real...</p>
+  </div>
+  } @else {
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="dashboard-grid">
+
+    <!-- TARJETA 1: PREDICCIÓN DE COSTOS -->
+    <mat-card class="kpi-card highlight-card">
+      <mat-card-header>
+        <mat-card-title>Costo Planilla Proyectado</mat-card-title>
+        <mat-card-subtitle>Para el siguiente periodo fiscal</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (dataCostos) {
+        <div class="big-number">
+          S/ {{ dataCostos.prediccion_costo_siguiente_periodo | number:'1.2-2' }}
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="label">Precisión (R²)</span>
+            <span class="value success">{{ dataCostos.metricas_validacion.r2_score * 100 | number:'1.2-2' }}%</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Calidad</span>
+            <span class="value">{{ dataCostos.metricas_validacion.interpretacion_r2 }}</span>
+          </div>
+        </div>
+        <p class="method-note"><small>{{ dataCostos.metodo }}</small></p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- TARJETA 2: ANÁLISIS DE PATRONES -->
+    <mat-card class="kpi-card">
+      <mat-card-header>
+        <mat-card-title>Segmentación de Adelantos</mat-card-title>
+        <mat-card-subtitle>Grupos detectados automáticamente (Clustering)</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (dataPatrones) {
+        <div class="cluster-info">
+          <span class="badge">Mejor K: {{ dataPatrones.mejor_k_encontrado }} grupos</span>
+          <span class="badge">Silhouette: {{ dataPatrones.calidad_agrupamiento_score | number:'1.2-2' }}</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Grupo</th>
+                <th>Perfil Detectado</th>
+                <th>Monto Promedio</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (patron of dataPatrones.patrones_detectados; track patron.grupo_cluster) {
+              <tr>
+                <td><span class="circle-id">{{ patron.grupo_cluster }}</span></td>
+                <td>{{ patron.etiqueta_sugerida }}</td>
+                <td class="money">S/ {{ patron.monto_promedio | number:'1.2-2' }}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
   </div>
 
-  <p class="text-lg text-center md:text-left opacity-80 my-6 md:my-8">
-    Resultados generados por los modelos de Inteligencia Artificial del sistema.
-  </p>
-
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    
-    @if (prediccionCostos$ | async; as pred) {
-      
-      <mat-card class="ia-card" id="card-prediccion">
-        <mat-card-header class="flex items-center gap-4">
-          <mat-icon class="text-[--primary-color] !text-4xl">insights</mat-icon>
+  <!-- TARJETA 3: DETECCIÓN DE ANOMALÍAS (NUEVO) -->
+  <div class="full-width-card">
+    <mat-card class="kpi-card warning-card">
+      <mat-card-header>
+        <div class="header-with-icon">
+          <mat-icon class="warning-icon">warning</mat-icon>
           <div>
-            <mat-card-title class="!text-xl !font-semibold">Predicción de Costos de Planilla</mat-card-title>
+            <mat-card-title>Auditoría IA: Detección de Anomalías</mat-card-title>
+            <mat-card-subtitle>Registros inusuales detectados por Isolation Forest</mat-card-subtitle>
           </div>
-        </mat-card-header>
-        <mat-card-content class="pt-4">
-          <p class="text-base">
-            El costo total estimado para el siguiente periodo de planilla es de:
-          </p>
-          
-          <h2 class_="text-5xl font-extrabold my-4 text-center text-[--primary-color]">
-            {{ pred.data.prediccion_costo_siguiente_periodo | currency:'S/ ':'symbol':'1.2-2' }}
-          </h2>
-          
-          <p class="text-sm italic opacity-70 mt-4 text-right">
-            <i>Método: {{ pred.data.metodo }}</i>
-          </p>
-        </mat-card-content>
-      </mat-card>
-    }
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        @if (dataAnomalias) {
+        <div class="alert-summary">
+          Se analizaron <strong>{{ dataAnomalias.total_registros_analizados }}</strong> registros y se encontraron
+          <span class="badge-warning">{{ dataAnomalias.anomalias_detectadas }} casos sospechosos</span>.
+        </div>
 
-    @if (patronesAdelantos$ | async; as patrones) {
-      <mat-card class="ia-card" id="card-patrones">
-        <mat-card-header class="flex items-center gap-4">
-          <mat-icon class="text-[--secondary-color] !text-4xl">hub</mat-icon>
-          <div>
-            <mat-card-title class="!text-xl !font-semibold">Patrones en Solicitudes de Adelantos</mat-card-title>
-          </div>
-        </mat-card-header>
-        <mat-card-content class="pt-4">
-          <p class="text-base">
-            Se han identificado los siguientes patrones (clusters) en las solicitudes:
-          </p>
-          
-          <ul class="mt-4 space-y-3">
-            @for (p of patrones.data.patrones_clusters; track p.cluster) {
-              <li class="text-base flex items-center gap-3">
-                <mat-icon class="text-[--secondary-color] !text-lg">local_florist</mat-icon>
-                <div>
-                  <strong class="font-medium">{{ p.cluster }}</strong>: 
-                  Monto promedio de {{ p.monto_promedio | currency:'S/ ':'symbol':'1.2-2' }}
-                </div>
-              </li>
-            }
-          </ul>
-
-          <p class="text-sm italic opacity-70 mt-6 text-right">
-            <i>Método: {{ patrones.data.metodo }}</i>
-          </p>
-        </mat-card-content>
-      </mat-card>
-    }
-  
+        @if (dataAnomalias.anomalias_detectadas > 0) {
+        <div class="table-responsive">
+          <table class="modern-table danger-mode">
+            <thead>
+              <tr>
+                <th>Empleado</th>
+                <th>Fecha</th>
+                <th>Hora Entrada</th>
+                <th>Duración</th>
+                <th>Diagnóstico IA</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of dataAnomalias.registros_sospechosos; track item.empleado) {
+              <tr>
+                <td><strong>{{ item.empleado }}</strong></td>
+                <td>{{ item.fecha }}</td>
+                <td>{{ item.hora_ingreso }}</td>
+                <td>{{ item.horas_trabajadas }} hrs</td>
+                <td class="diagnosis">{{ item.motivo_ia }}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        } @else {
+        <div class="clean-state">
+          <mat-icon>check_circle</mat-icon>
+          <p>No se encontraron comportamientos anómalos. Todo normal.</p>
+        </div>
+        }
+        }
+      </mat-card-content>
+    </mat-card>
   </div>
+  }
 </div>

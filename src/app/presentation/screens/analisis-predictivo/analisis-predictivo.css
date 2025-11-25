@@ -1,61 +1,236 @@
-/* :host aplica estilos a este componente.
-  Le decimos que use el fondo y color de texto de tu tema global.
-*/
-:host {
-  display: block;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  min-height: 100vh; /* Ocupa toda la altura */
+.ia-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Esta es nuestra clase personalizada para las mat-card.
-  Sobreescribimos los estilos de Material para que usen 
-  los fondos, bordes y sombras de TU TEMA.
-*/
-.ia-card {
-  /* ¡Usa el fondo de tarjeta de tu tema! */
-  background-color: var(--card-bg) !important; 
-  /* ¡Usa el color de texto de tu tema! */
-  color: var(--text-color) !important;
-  
-  /* Usa el borde y sombra de tu tema */
-  border: 1px solid var(--border-color);
-  border-radius: 16px !important; /* Bordes redondeados (como tu .tituloI) */
-  box-shadow: 0 4px 12px var(--shadow) !important;
-  
-  /* ¡Efecto "vivo" al pasar el mouse! */
-  transition: all 0.3s ease-in-out;
+.ia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.ia-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 10px 25px var(--shadow) !important;
-  /* Damos un brillo sutil con tu color primario */
-  border-color: var(--primary-color);
+.header-content h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #2c3e50;
+  margin: 0;
+  font-size: 1.8rem;
 }
 
-/* Ajustes finos para que el texto dentro de las tarjetas 
-  de Material herede el color de texto correcto.
-*/
-.ia-card mat-card-title,
-.ia-card mat-card-content,
-.ia-card mat-card-subtitle,
-.ia-card p,
-.ia-card li {
-  color: var(--text-color) !important;
+.header-actions {
+  display: flex;
+  gap: 1rem;
 }
 
-.ia-card mat-card-title {
-  opacity: 1; /* Título bien visible */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
 }
 
-.ia-card mat-card-subtitle,
-.ia-card p {
-  opacity: 0.9; /* Texto ligeramente más suave */
+.kpi-card {
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.2s;
 }
 
-/* Hacemos los íconos un poco más grandes */
-.ia-card mat-icon {
-  height: auto !important;
-  width: auto !important;
+.kpi-card:hover {
+  transform: translateY(-5px);
+}
+
+.big-number {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #16a085;
+  /* Verde InkaPeru */
+  text-align: center;
+  margin: 1.5rem 0;
+  letter-spacing: -1px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-item .label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #7f8c8d;
+}
+
+.stat-item .value {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.success {
+  color: #27ae60;
+}
+
+.method-note {
+  text-align: center;
+  color: #bdc3c7;
+  margin-top: 1rem;
+}
+
+/* Tabla Moderna */
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.modern-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f1f2f6;
+  color: #57606f;
+  font-weight: 600;
+}
+
+.modern-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.circle-id {
+  background: #34495e;
+  color: white;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.cluster-info {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.badge {
+  background: #e8f6f3;
+  color: #16a085;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Loading */
+.loading-state {
+  text-align: center;
+  padding: 4rem;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Estilos para la sección de Anomalías */
+.full-width-card {
+  grid-column: 1 / -1;
+  /* Ocupa todo el ancho del grid */
+  margin-top: 2rem;
+}
+
+.warning-card {
+  border-left: 5px solid #e74c3c;
+  /* Rojo alerta */
+}
+
+.warning-icon {
+  color: #e74c3c;
+  font-size: 30px;
+  height: 30px;
+  width: 30px;
+  margin-right: 10px;
+}
+
+.header-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.badge-warning {
+  background-color: #fcebea;
+  color: #c0392b;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.danger-mode th {
+  background-color: #fdedec;
+  color: #c0392b;
+}
+
+.diagnosis {
+  color: #e67e22;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.clean-state {
+  text-align: center;
+  padding: 2rem;
+  color: #27ae60;
+}
+
+.clean-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
 }

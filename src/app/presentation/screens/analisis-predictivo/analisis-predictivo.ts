@@ -1,182 +1,203 @@
-import { Component } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http'; // <-- Importamos HttpClientModule
-import { CommonModule } from '@angular/common'; 
-import { Observable, of } from 'rxjs';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
-import { environment } from '../../../../environments/environments'; // <-- IMPORTANTE: Usamos tu environment
-import { MatIconModule } from '@angular/material/icon'; 
+import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { environment } from '../../../../environments/environments';
 
-// --- 2. IMPORTAR 'jsPDF' (html2canvas ya no es necesario) ---
-import jsPDF from 'jspdf'; 
-import { applyPlugin } from 'jspdf-autotable';
-import { catchError, tap } from 'rxjs/operators';
+// --- LIBRERÍAS PDF ---
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable'; // Importación correcta para versiones recientes
 
-interface ApiResponse {
+// --- INTERFACES (El "Contrato" con tu IA) ---
+interface MetricasValidacion {
+  r2_score: number;
+  interpretacion_r2: string;
+  error_cuadratico_medio_mse: number;
+}
+
+interface ResponseCostos {
+  prediccion_costo_siguiente_periodo: number;
+  metodo: string;
+  metricas_validacion: MetricasValidacion;
+  variables_usadas: string[];
+  datos_historicos_usados: number;
+}
+
+interface Patron {
+  grupo_cluster: number;
+  etiqueta_sugerida: string;
+  monto_promedio: number;
+}
+
+interface ResponsePatrones {
+  patrones_detectados: Patron[];
+  metodo: string;
+  mejor_k_encontrado: number;
+  calidad_agrupamiento_score: number;
+  analisis_optimizacion: any[];
+}
+
+interface ApiResponse<T> {
   status: string;
-  data: any;
+  data: T;
+}
+
+interface Anomalia {
+  empleado: string;
+  fecha: string;
+  hora_ingreso: string;
+  horas_trabajadas: number;
+  motivo_ia: string;
+}
+
+interface ResponseAnomalias {
+  total_registros_analizados: number;
+  anomalias_detectadas: number;
+  registros_sospechosos: Anomalia[];
+  metodo: string;
 }
 
 @Component({
   selector: 'app-analisis-predictivo',
-  standalone: true, 
-  
+  standalone: true,
   imports: [
-    CommonModule,     
+    CommonModule,
     MatCardModule,
-    HttpClientModule,MatIconModule ,MatButtonModule
+    MatIconModule,
+    MatButtonModule,
+    HttpClientModule
   ],
   templateUrl: './analisis-predictivo.html',
-  styleUrl: './analisis-predictivo.css' 
+  styleUrl: './analisis-predictivo.css'
 })
-export class AnalisisPredictivo { 
-  
-  // La URL base viene de tu archivo environment
-  public API_URL = environment.apiUrl; 
+export class AnalisisPredictivo implements OnInit {
 
-  public prediccionCostos$: Observable<ApiResponse | null> | null = null;
-  public patronesAdelantos$: Observable<ApiResponse | null> | null = null;
+  // Inyección de dependencias moderna
+  private http = inject(HttpClient);
+  private apiUrl = environment.apiUrl + '/api/v1/ia';
 
-  private prediccionData: any = null;
-  private patronesData: any = null;
+  // Variables de Estado (State)
+  public dataCostos: ResponseCostos | null = null;
+  public dataPatrones: ResponsePatrones | null = null;
 
-  public isGenerandoPDF = false;
+  public loading: boolean = true;
+  public isGenerandoPDF: boolean = false;
 
-  
+  public dataAnomalias: ResponseAnomalias | null = null;
 
-  constructor(private http: HttpClient) { 
-    
-    this.prediccionCostos$ = this.http.get<ApiResponse>(
-      `${this.API_URL}/api/v1/ia/predecir-costos-planilla`
-    ).pipe(
-      tap(res => this.prediccionData = res.data), // Guardamos los datos para el PDF
-      catchError(error => {
-        console.error('Error al obtener la predicción de costos:', error);
-        alert('No se pudo cargar la predicción de costos. Inténtalo de nuevo más tarde.');
-        return of(null); 
-      })
-    );
-
-    this.patronesAdelantos$ = this.http.get<ApiResponse>(
-      `${this.API_URL}/api/v1/ia/patrones-adelantos`
-    ).pipe(
-      tap(res => this.patronesData = res.data), // Guardamos los datos para el PDF
-      catchError(error => {
-        console.error('Error al obtener los patrones de adelantos:', error);
-        alert('No se pudieron cargar los patrones de adelantos. Inténtalo de nuevo más tarde.');
-        return of(null); // Devuelve un observable nulo
-      })
-    );
+  ngOnInit(): void {
+    this.cargarDatosIA();
   }
 
+  cargarDatosIA() {
+    this.loading = true;
 
-
-
- // --- 4. FUNCIÓN PDF TOTALMENTE NUEVA Y PROFESIONAL ---
-  public exportarPDF(): void { 
-    if (!this.prediccionData || !this.patronesData) {
-      alert("Espera a que los datos carguen antes de exportar.");
-      return;
-    }
-    
-    this.isGenerandoPDF = true;
-    
-    try {
-      // --- CORRECCIÓN: Aplicar el plugin de autotable ---
-      applyPlugin(jsPDF);
-
-      const pdf = new jsPDF('p', 'pt', 'a4'); // 'p' = portrait, 'pt' = points, 'a4'
-      const margin = 40;
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const contentWidth = pageWidth - margin * 2;
-      let cursorY = margin; // Posición Y inicial
-
-      // --- TÍTULO ---
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(20);
-      pdf.text("Reporte de Análisis Predictivo (IA)", pageWidth / 2, cursorY, { align: 'center' });
-      cursorY += 30; // Mover cursor
-
-      // --- FECHA DE GENERACIÓN ---
-      pdf.setFont('helvetica', 'italic');
-      pdf.setFontSize(10);
-      const fecha = new Date().toLocaleString('es-ES');
-      pdf.text(`Generado el: ${fecha}`, pageWidth / 2, cursorY, { align: 'center' });
-      cursorY += 30;
-
-      // --- SECCIÓN 1: PREDICCIÓN DE COSTOS (REQ-35/36) ---
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(16);
-      pdf.text("1. Predicción de Costos de Planilla", margin, cursorY);
-      cursorY += 20;
-
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(12);
-      // Formatear el número como moneda
-      const costoPredicho = Number(this.prediccionData.prediccion_costo_siguiente_periodo).toLocaleString('es-PE', {
-        style: 'currency',
-        currency: 'PEN'
+    // 1. Cargar Predicción de Costos
+    this.http.get<ApiResponse<ResponseCostos>>(`${this.apiUrl}/predecir-costos-planilla`)
+      .subscribe({
+        next: (res) => {
+          this.dataCostos = res.data;
+        },
+        error: (err) => console.error('Error costos:', err)
       });
-      pdf.text(`Predicción de costo para el siguiente periodo:`, margin, cursorY);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(costoPredicho, margin + 270, cursorY); // Ajustar posición X
-      cursorY += 20;
-      
-      pdf.setFont('helvetica', 'italic');
-      pdf.setFontSize(10);
-      pdf.text(`Método utilizado: ${this.prediccionData.metodo}`, margin, cursorY);
-      cursorY += 30;
 
-      // --- SECCIÓN 2: PATRONES DE ADELANTOS (REQ-37) ---
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(16);
-      pdf.text("2. Patrones en Solicitudes de Adelantos", margin, cursorY);
-      cursorY += 20;
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(12);
-      pdf.text("Se identificaron los siguientes patrones (clusters) en las solicitudes:", margin, cursorY);
-      cursorY += 20;
-
-      // Usar jsPDF-AutoTable para crear una tabla profesional
-      (pdf as any).autoTable({
-        startY: cursorY,
-        head: [['Patrón Detectado', 'Monto Promedio']],
-        body: this.patronesData.patrones_clusters.map((p: any) => [
-          p.cluster,
-          Number(p.monto_promedio).toLocaleString('es-PE', { style: 'currency', currency: 'PEN' })
-        ]),
-        theme: 'striped', // 'striped', 'grid', 'plain'
-        headStyles: {
-          fillColor: [15, 153, 128] // Tu color --primary-color
+    // 2. Cargar Patrones de Adelantos
+    this.http.get<ApiResponse<ResponsePatrones>>(`${this.apiUrl}/patrones-adelantos`)
+      .subscribe({
+        next: (res) => {
+          this.dataPatrones = res.data;
+          this.loading = false; // Terminamos de cargar
+        },
+        error: (err) => {
+          console.error('Error patrones:', err);
+          this.loading = false;
         }
       });
-      
-      // Mover cursor Y después de la tabla
-      cursorY = (pdf as any).lastAutoTable.finalY + 20; 
 
-      pdf.setFont('helvetica', 'italic');
-      pdf.setFontSize(10);
-      pdf.text(`Método utilizado: ${this.patronesData.metodo}`, margin, cursorY);
+    // 3. Cargar Anomalías
+    this.http.get<ApiResponse<ResponseAnomalias>>(`${this.apiUrl}/detectar-anomalias-asistencia`)
+      .subscribe({
+        next: (res) => this.dataAnomalias = res.data,
+        error: (err) => console.error('Error anomalías:', err)
+      });
+  }
 
-      // --- PIE DE PÁGINA ---
-      const pageCount = (pdf as any).internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        pdf.setPage(i);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
-        pdf.text(`Página ${i} de ${pageCount}`, pageWidth / 2, pageHeight - margin / 2, { align: 'center' });
-      }
+  exportarExcel() {
+    window.open(`${this.apiUrl}/exportar-predicciones-excel`, '_blank');
+  }
 
-      // --- Guardar PDF ---
-      pdf.save('Reporte_Formal_IA.pdf');
-
-    } catch (error) {
-      console.error("Error al generar el PDF:", error);
-      alert("Hubo un error al generar el PDF.");
+  exportarPDF() {
+    if (!this.dataCostos || !this.dataPatrones) {
+      alert('Los datos aún se están procesando. Intente en unos segundos.');
+      return;
     }
 
+    this.isGenerandoPDF = true;
+    const doc = new jsPDF();
+    const margen = 20;
+    let cursorY = 20;
+
+    // --- ENCABEZADO ---
+    doc.setFontSize(18);
+    doc.setTextColor(0, 102, 204); // Azul corporativo
+    doc.text('Informe de Inteligencia Artificial InkaPeru', margen, cursorY);
+
+    cursorY += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, margen, cursorY);
+    doc.line(margen, cursorY + 2, 190, cursorY + 2);
+
+    cursorY += 15;
+
+    // --- SECCIÓN 1: COSTOS ---
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text('1. Proyección de Costos Operativos', margen, cursorY);
+    cursorY += 10;
+
+    doc.setFontSize(11);
+    doc.text(`Predicción Siguiente Periodo: S/ ${this.dataCostos.prediccion_costo_siguiente_periodo.toFixed(2)}`, margen, cursorY);
+    cursorY += 7;
+    doc.text(`Confianza del Modelo (R²): ${(this.dataCostos.metricas_validacion.r2_score * 100).toFixed(2)}%`, margen, cursorY);
+    cursorY += 7;
+    doc.text(`Calidad: ${this.dataCostos.metricas_validacion.interpretacion_r2}`, margen, cursorY);
+    cursorY += 7;
+    doc.text(`Método: ${this.dataCostos.metodo}`, margen, cursorY);
+
+    cursorY += 15;
+
+    // --- SECCIÓN 2: PATRONES ---
+    doc.setFontSize(14);
+    doc.text('2. Segmentación de Adelantos (Clustering)', margen, cursorY);
+    cursorY += 5; // Espacio antes de la tabla
+
+    // Tabla generada con autoTable
+    const columnas = ['Grupo', 'Descripción', 'Monto Promedio (S/)'];
+    const filas = this.dataPatrones.patrones_detectados.map(p => [
+      `Grupo ${p.grupo_cluster}`,
+      p.etiqueta_sugerida,
+      `S/ ${p.monto_promedio.toFixed(2)}`
+    ]);
+
+    autoTable(doc, {
+      startY: cursorY,
+      head: [columnas],
+      body: filas,
+      theme: 'grid',
+      headStyles: { fillColor: [22, 160, 133] }, // Verde InkaPeru
+      margin: { left: margen }
+    });
+
+    // Pie de página
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    doc.setFontSize(9);
+    doc.setTextColor(150);
+    doc.text('Este reporte fue generado automáticamente por el módulo de IA.', margen, finalY);
+
+    doc.save('Reporte_IA_InkaPeru.pdf');
     this.isGenerandoPDF = false;
   }
 }
