@@ -4,7 +4,7 @@
   <header class="ia-header">
     <div class="header-content">
       <h1><mat-icon>psychology</mat-icon> Análisis Predictivo (IA)</h1>
-      <p>Módulo de inteligencia artificial para proyección de costos y detección de patrones.</p>
+      <p>Proyección de costos futuros y detección de patrones en RRHH.</p>
     </div>
     <div class="header-actions">
       <button mat-raised-button color="primary" (click)="exportarExcel()">
@@ -20,52 +20,89 @@
   @if (loading) {
   <div class="loading-state">
     <div class="spinner"></div>
-    <p>Entrenando modelos en tiempo real...</p>
+    <p>Analizando datos históricos...</p>
   </div>
   } @else {
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <div class="dashboard-grid">
+  <!-- GRID SUPERIOR: GRÁFICO + KPIs -->
+  <div class="main-grid">
 
-    <!-- TARJETA 1: PREDICCIÓN DE COSTOS -->
-    <mat-card class="kpi-card highlight-card">
+    <!-- SECCIÓN 1: GRÁFICO DE PREDICCIÓN (Ocupa más espacio) -->
+    <mat-card class="chart-card shadow-card">
       <mat-card-header>
-        <mat-card-title>Costo Planilla Proyectado</mat-card-title>
-        <mat-card-subtitle>Para el siguiente periodo fiscal</mat-card-subtitle>
+        <div class="header-with-icon">
+          <mat-icon class="chart-icon">show_chart</mat-icon>
+          <div>
+            <mat-card-title>Proyección de Costos de Planilla</mat-card-title>
+            <mat-card-subtitle>Histórico vs Predicción (Regresión Lineal)</mat-card-subtitle>
+          </div>
+        </div>
       </mat-card-header>
       <mat-card-content>
-        @if (dataCostos) {
-        <div class="big-number">
-          S/ {{ dataCostos.prediccion_costo_siguiente_periodo | number:'1.2-2' }}
+        <div class="chart-container">
+          <!-- Aquí se renderiza el gráfico -->
+          <canvas id="chartPrediccion"></canvas>
         </div>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="label">Precisión (R²)</span>
-            <span class="value success">{{ dataCostos.metricas_validacion.r2_score * 100 | number:'1.2-2' }}%</span>
-          </div>
-          <div class="stat-item">
-            <span class="label">Calidad</span>
-            <span class="value">{{ dataCostos.metricas_validacion.interpretacion_r2 }}</span>
-          </div>
-        </div>
-        <p class="method-note"><small>{{ dataCostos.metodo }}</small></p>
-        }
       </mat-card-content>
     </mat-card>
 
-    <!-- TARJETA 2: ANÁLISIS DE PATRONES -->
-    <mat-card class="kpi-card">
+    <!-- SECCIÓN 2: KPIs (Tarjetas laterales) -->
+    <div class="kpi-column">
+
+      <!-- KPI Costo -->
+      <mat-card class="kpi-card highlight-card">
+        <mat-card-content>
+          <p class="kpi-label">Proyección Mes Siguiente</p>
+          @if (dataCostos) {
+          <div class="kpi-value">
+            S/ {{ dataCostos.prediccion_costo_siguiente_periodo | number:'1.2-2' }}
+          </div>
+          <div class="kpi-trend positive">
+            <mat-icon>trending_up</mat-icon> Estimación IA
+          </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- KPI Precisión -->
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <p class="kpi-label">Confianza del Modelo (R²)</p>
+          @if (dataCostos) {
+          <div class="kpi-value success-text">
+            {{ dataCostos.metricas_validacion.r2_score * 100 | number:'1.2-2' }}%
+          </div>
+          <p class="kpi-subtext">{{ dataCostos.metricas_validacion.interpretacion_r2 }}</p>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- KPI Clusters -->
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <p class="kpi-label">Patrones Detectados</p>
+          @if (dataPatrones) {
+          <div class="kpi-value">
+            {{ dataPatrones.mejor_k_encontrado }} Grupos
+          </div>
+          <p class="kpi-subtext">Segmentación de adelantos</p>
+          }
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+  </div>
+
+  <!-- GRID INFERIOR: DETALLES -->
+  <div class="details-grid">
+
+    <!-- SECCIÓN 3: TABLA DE PATRONES -->
+    <mat-card class="full-width-card shadow-card">
       <mat-card-header>
-        <mat-card-title>Segmentación de Adelantos</mat-card-title>
-        <mat-card-subtitle>Grupos detectados automáticamente (Clustering)</mat-card-subtitle>
+        <mat-card-title>Segmentación de Comportamiento (Clustering)</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         @if (dataPatrones) {
-        <div class="cluster-info">
-          <span class="badge">Mejor K: {{ dataPatrones.mejor_k_encontrado }} grupos</span>
-          <span class="badge">Silhouette: {{ dataPatrones.calidad_agrupamiento_score | number:'1.2-2' }}</span>
-        </div>
-
         <div class="table-responsive">
           <table class="modern-table">
             <thead>
@@ -90,37 +127,36 @@
       </mat-card-content>
     </mat-card>
 
-  </div>
-
-  <!-- TARJETA 3: DETECCIÓN DE ANOMALÍAS (NUEVO) -->
-  <div class="full-width-card">
-    <mat-card class="kpi-card warning-card">
+    <!-- SECCIÓN 4: ANOMALÍAS -->
+    <mat-card class="full-width-card warning-card shadow-card">
       <mat-card-header>
         <div class="header-with-icon">
           <mat-icon class="warning-icon">warning</mat-icon>
           <div>
-            <mat-card-title>Auditoría IA: Detección de Anomalías</mat-card-title>
-            <mat-card-subtitle>Registros inusuales detectados por Isolation Forest</mat-card-subtitle>
+            <mat-card-title>Auditoría de Asistencia (Isolation Forest)</mat-card-title>
+            <mat-card-subtitle>Detección de registros inusuales</mat-card-subtitle>
           </div>
         </div>
       </mat-card-header>
       <mat-card-content>
         @if (dataAnomalias) {
         <div class="alert-summary">
-          Se analizaron <strong>{{ dataAnomalias.total_registros_analizados }}</strong> registros y se encontraron
-          <span class="badge-warning">{{ dataAnomalias.anomalias_detectadas }} casos sospechosos</span>.
+          Analizados: <strong>{{ dataAnomalias.total_registros_analizados }}</strong> registros.
+          @if (dataAnomalias.anomalias_detectadas > 0) {
+          <span class="badge-warning">{{ dataAnomalias.anomalias_detectadas }} anomalías detectadas</span>
+          }
         </div>
 
         @if (dataAnomalias.anomalias_detectadas > 0) {
-        <div class="table-responsive">
+        <div class="table-responsive mt-3">
           <table class="modern-table danger-mode">
             <thead>
               <tr>
                 <th>Empleado</th>
                 <th>Fecha</th>
-                <th>Hora Entrada</th>
+                <th>Hora</th>
                 <th>Duración</th>
-                <th>Diagnóstico IA</th>
+                <th>Diagnóstico</th>
               </tr>
             </thead>
             <tbody>
@@ -139,12 +175,13 @@
         } @else {
         <div class="clean-state">
           <mat-icon>check_circle</mat-icon>
-          <p>No se encontraron comportamientos anómalos. Todo normal.</p>
+          <p>Sin anomalías detectadas.</p>
         </div>
         }
         }
       </mat-card-content>
     </mat-card>
+
   </div>
   }
 </div>

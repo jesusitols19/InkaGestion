@@ -1,353 +1,226 @@
-<div class="mb-4 rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-  
-  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 gap-4 md:grid-cols-5 md:items-end">
+<div class="mb-6 rounded-lg bg-white p-5 shadow-sm border border-gray-100">
+  <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+      <i class="fas fa-filter text-primary-600"></i> Filtros de Inteligencia de Negocios
+    </h2>
+  </div>
 
-    <mat-form-field appearance="fill" class="md:col-span-2">
-      <mat-label>Rango de Fechas</mat-label>
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 gap-4 md:grid-cols-5 md:items-end">
+    <!-- Tus filtros existentes (sin cambios mayores) -->
+    <mat-form-field appearance="outline" class="md:col-span-2 density-compact">
+      <mat-label>Periodo de Análisis</mat-label>
       <mat-date-range-input [rangePicker]="picker">
-        <input matStartDate formControlName="startDate" placeholder="Fecha inicio">
-        <input matEndDate formControlName="endDate" placeholder="Fecha fin">
+        <input matStartDate formControlName="startDate" placeholder="Inicio">
+        <input matEndDate formControlName="endDate" placeholder="Fin">
       </mat-date-range-input>
       <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-date-range-picker #picker></mat-date-range-picker>
     </mat-form-field>
 
-    <mat-form-field appearance="fill">
-      <mat-label>Filtrar por Área</mat-label>
+    <mat-form-field appearance="outline" class="density-compact">
+      <mat-label>Área Operativa</mat-label>
       <mat-select formControlName="areaId">
-        <mat-option [value]="null">Todas las Áreas</mat-option>
-        
+        <mat-option [value]="null">Todas</mat-option>
         @for (area of areas(); track area.id) {
-          <mat-option [value]="area.id">{{ area.nombre }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-      <mat-label>Filtrar por Trabajador</mat-label>
-      <mat-select formControlName="employeeId">
-        <mat-option [value]="null">Todos los Trabajadores</mat-option>
-        
-        @for (emp of employees(); track emp.id) {
-          <mat-option [value]="emp.id">{{ emp.nombres }} {{ emp.apellido_paterno }}</mat-option>
+        <mat-option [value]="area.id">{{ area.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
 
     <div class="flex gap-2">
-      <button mat-raised-button color="primary" type="submit">
-        <i class="fas fa-filter mr-2"></i>
+      <button mat-raised-button color="primary" type="submit" class="w-full">
         Aplicar
       </button>
-      <button mat-button type="button" (click)="clearFilters()">
+      <button mat-stroked-button type="button" (click)="clearFilters()">
         Limpiar
       </button>
     </div>
   </form>
 </div>
 
-
-<!-- Estadísticas Principales -->
+<!-- KPI CARDS (Datos Reales del Backend) -->
 <div class="stats-grid">
-  <!-- Total Empleados -->
-  <div [class]="'stat-card primary'">
-    <div class="stat-icon">
-      <i class="fas fa-users"></i>
-    </div>
+
+  <!-- 1. Total Empleados -->
+  <div class="stat-card primary">
+    <div class="stat-icon"><i class="fas fa-users"></i></div>
     <div class="stat-content">
-      <h3>{{ stats().totalEmpleados }}</h3>
-      <p>Total Empleados</p>
-      <span class="stat-subtitle">Personal registrado</span>
+      <h3>{{ kpis().total_empleados.total_empleados }}</h3>
+      <p>Personal Activo</p>
+      <span class="stat-subtitle">Total registrado en sistema</span>
     </div>
   </div>
 
-  <!-- Asistencia Hoy -->
-  <div [class]="'stat-card success'">
-    <div class="stat-icon">
-      <i class="fas fa-user-check"></i>
-    </div>
+  <!-- 2. Asistencia Hoy -->
+  <div class="stat-card success">
+    <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
     <div class="stat-content">
-      <h3>{{ stats().asistenciaHoy }}/{{ stats().totalEmpleados }}</h3>
+      <h3>{{ kpis().resumen_asistencia_hoy.empleados_presentes }} <span class="text-sm text-gray-500">/ {{
+          kpis().total_empleados.total_empleados }}</span></h3>
       <p>Asistencia Hoy</p>
-      <span class="stat-subtitle">{{ stats().asistenciaPorcentaje | number:'1.1-1' }}% presente</span>
-    </div>
-    <div [class]="'stat-trend positive'">
-      <i class="fas fa-arrow-up"></i>
-      +2.3%
+      <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+        <div class="bg-green-500 h-2.5 rounded-full"
+          [style.width.%]="kpis().resumen_asistencia_hoy.porcentaje_asistencia"></div>
+      </div>
+      <span class="stat-subtitle mt-1 block">{{ kpis().resumen_asistencia_hoy.porcentaje_asistencia | number:'1.1-1' }}%
+        Presentismo</span>
     </div>
   </div>
 
-
-  <!-- Pagos Pendientes -->
-  <div [class]="'stat-card warning'">
-    <div class="stat-icon">
-      <i class="fas fa-exclamation-triangle"></i>
-    </div>
+  <!-- 3. Pagos Pendientes (Alerta) -->
+  <div class="stat-card warning">
+    <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
     <div class="stat-content">
-      <h3>{{ stats().pagosPendientes }}</h3>
-      <p>Pagos Pendientes</p>
-      <span class="stat-subtitle">Requieren atención</span>
+      <h3>{{ kpis().pagos_pendientes.pagos_pendientes }}</h3>
+      <p>Gestiones Pendientes</p>
+      <span class="stat-subtitle">Adelantos y Pagos por procesar</span>
+    </div>
+  </div>
+
+  <!-- 4. Gasto Mensual Proyectado -->
+  <div class="stat-card secondary">
+    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+    <div class="stat-content">
+      <h3>{{ kpis().gasto_personal_total.gasto_total_personal | currency:'PEN':'symbol':'1.0-0' }}</h3>
+      <p>Costo Planilla Base</p>
+      <span class="stat-subtitle">Mensual proyectado</span>
     </div>
   </div>
 </div>
 
-<!-- Contenido Principal -->
-<div class="dashboard-content">
-  <!-- Columna Izquierda -->
-  <div class="left-column">
-    
-    <!-- Gráfico Semanal -->
+<!-- CONTENIDO PRINCIPAL (GRÁFICOS BI) -->
+<div class="dashboard-content mt-6">
+
+  <!-- COLUMNA IZQUIERDA -->
+  <div class="left-column flex flex-col gap-6">
+
+    <!-- GRÁFICO 1: TENDENCIA DE ASISTENCIA (Dinámico) -->
     <div class="card chart-card">
       <div class="card-header">
-        <h3>
-          <i class="fas fa-chart-bar"></i>
-          Asistencia Semanal
-        </h3>
+        <h3><i class="fas fa-chart-bar"></i> Tendencia de Asistencia (Últimos Días)</h3>
         <div class="chart-legend">
           <span class="legend-item present">
-            <div class="legend-color"></div>
-            Presente
+            <div class="legend-color bg-green-500"></div> A tiempo
           </span>
-          <span class="legend-item absent">
-            <div class="legend-color"></div>
-            Ausente
+          <span class="legend-item warning">
+            <div class="legend-color bg-yellow-400"></div> Tardanza
           </span>
         </div>
       </div>
-      <div class="chart-container">
-        <div class="weekly-chart">
-          @for (dia of datosSemanales(); track dia.dia) {
-            <div class="chart-bar">
-              <div class="bar-container">
-                <div 
-                  class="bar-fill" 
-                  [style.height.%]="dia.porcentaje"
-                  [attr.title]="'Asistencia: ' + dia.porcentaje + '%'"
-                  [attr.aria-label]="'Día ' + dia.dia + ': ' + dia.porcentaje + '% de asistencia'">
-                </div>
-              </div>
-              <span class="day-label">{{ dia.dia }}</span>
-              <small class="percentage">{{ dia.porcentaje }}%</small>
+
+      <div class="chart-container h-64 flex items-end justify-between px-4 gap-2 pt-10">
+        @if (datosTendencia().length === 0) {
+        <div class="w-full h-full flex items-center justify-center text-gray-400">
+          No hay datos de asistencia recientes.
+        </div>
+        }
+        @for (dia of datosTendencia(); track dia.dia) {
+        <div class="flex flex-col items-center flex-1 h-full justify-end group relative">
+
+          <!-- Tooltip Simple -->
+          <div
+            class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded z-10 whitespace-nowrap">
+            {{ dia.dia }}: {{ dia.a_tiempo }} ok, {{ dia.tardanza }} tarde
+          </div>
+
+          <!-- Barra Apilada CSS -->
+          <div class="w-full max-w-[40px] bg-gray-100 rounded-t-lg relative overflow-hidden flex flex-col-reverse"
+            [style.height.%]="dia.porcentaje">
+
+            <!-- Segmento A Tiempo -->
+            <div class="w-full bg-green-500 transition-all duration-1000"
+              [style.height.%]="(dia.a_tiempo / (dia.total || 1)) * 100"></div>
+
+            <!-- Segmento Tardanza -->
+            <div class="w-full bg-yellow-400 transition-all duration-1000"
+              [style.height.%]="(dia.tardanza / (dia.total || 1)) * 100"></div>
+          </div>
+
+          <span class="text-xs text-gray-600 mt-2 font-medium">{{ dia.dia }}</span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- GRÁFICO 2: HISTÓRICO DE COSTOS -->
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="fas fa-history"></i> Histórico de Costos de Planilla</h3>
+      </div>
+      <div class="p-6">
+        @for (mes of datosCostosMensuales(); track mes.mes) {
+        <div class="mb-4">
+          <div class="flex justify-between text-sm mb-1">
+            <span class="font-bold text-gray-700">{{ mes.mes }}</span>
+            <span class="font-bold text-gray-900">{{ mes.monto | currency:'PEN' }}</span>
+          </div>
+          <div class="w-full bg-gray-100 rounded-full h-4">
+            <div class="bg-blue-600 h-4 rounded-full transition-all duration-1000"
+              [style.width.%]="mes.porcentajeRelativo"></div>
+          </div>
+        </div>
+        }
+        @if (datosCostosMensuales().length === 0) {
+        <p class="text-center text-gray-500">No hay historial de planillas cerradas.</p>
+        }
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COLUMNA DERECHA -->
+  <div class="right-column flex flex-col gap-6">
+
+    <!-- KPI: HORAS EXTRA (Ranking) -->
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="fas fa-medal"></i> Top Horas Extra (Mes Actual)</h3>
+      </div>
+      <div class="p-4">
+        @if (topEmpleadosExtra().length === 0) {
+        <div class="text-center py-8 text-gray-400">
+          <i class="fas fa-clock text-3xl mb-2"></i>
+          <p>Nadie ha realizado horas extra este mes.</p>
+        </div>
+        }
+        @for (emp of topEmpleadosExtra(); track emp.nombre) {
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">
+            {{ emp.nombre.charAt(0) }}
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between text-sm">
+              <span class="font-medium">{{ emp.nombre }}</span>
+              <span class="font-bold text-purple-700">{{ emp.horas }} hrs</span>
             </div>
-          }
+            <div class="w-full bg-gray-100 rounded-full h-1.5 mt-1">
+              <div class="bg-purple-500 h-1.5 rounded-full" [style.width.%]="emp.porcentaje"></div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- KPI: EFICIENCIA DETALLADA -->
+    <div class="card p-5">
+      <h4 class="text-gray-500 text-sm font-uppercase mb-4 font-bold">Resumen de Eficiencia</h4>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 text-center">
+          <i class="fas fa-clock text-blue-500 text-xl mb-2"></i>
+          <h5 class="text-2xl font-bold text-gray-800">{{ kpis().promedio_horas_hoy.promedio_horas_hoy | number:'1.1-1'
+            }}</h5>
+          <span class="text-xs text-gray-500">Promedio Horas/Día</span>
+        </div>
+        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 text-center">
+          <i class="fas fa-business-time text-orange-500 text-xl mb-2"></i>
+          <h5 class="text-2xl font-bold text-gray-800">{{ kpis().horas_trabajadas_total_general.total_general |
+            number:'1.0-0' }}</h5>
+          <span class="text-xs text-gray-500">Total Horas Mes</span>
         </div>
       </div>
     </div>
 
-    <!-- Personal de Campo -->
-    <div class="card">
-      <div class="card-header">
-        <h3>
-          <i class="fas fa-map-marker-alt"></i>
-          Personal de Campo - Estado Actual
-        </h3>
-        <span [class]="'badge success'">{{ empleadosActivos() }} activos</span>
-      </div>
-      <div class="field-workers">
-        @for (trabajador of personalCampo(); track trabajador.id) {
-          <div 
-            [class]="{
-              'worker-card': true,
-              'active': trabajador.estado === 'activo',
-              'rest': trabajador.estado === 'descanso'
-            }"
-            (click)="verDetalleEmpleado(trabajador)"
-            [attr.role]="'button'"
-            [attr.tabindex]="0"
-            [attr.aria-label]="'Ver detalles de ' + trabajador.nombre">
-            
-            <div class="worker-info">
-              <div class="worker-header">
-                <h4>{{ trabajador.nombre }}</h4>
-                <span 
-                  [class]="'status-badge ' + trabajador.estado"
-                  [attr.aria-label]="'Estado: ' + trabajador.estado">
-                  {{ trabajador.estado === 'activo' ? 'Activo' : 'Descanso' }}
-                </span>
-              </div>
-              
-              <div class="worker-details">
-                <p class="sector">
-                  <i class="fas fa-map-pin"></i>
-                  {{ trabajador.sector }}
-                </p>
-                <p class="activity">
-                  <i class="fas fa-hammer"></i>
-                  {{ trabajador.actividad }}
-                </p>
-                <div class="worker-stats">
-                  <span class="hours">
-                    <i class="fas fa-clock"></i>
-                    {{ trabajador.horasHoy }}h hoy
-                  </span>
-                  @if (trabajador.entrada !== '-') {
-                    <span class="entry-time">
-                      <i class="fas fa-sign-in-alt"></i>
-                      Entrada: {{ trabajador.entrada }}
-                    </span>
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
-
-  <!-- Columna Derecha -->
-  <div class="right-column">
-    
-    <!-- Alertas Importantes -->
-    <div [class]="'card alerts-card'">
-      <div class="card-header">
-        <h3>
-          <i class="fas fa-bell"></i>
-          Alertas Importantes
-        </h3>
-        <span [class]="'badge alert'">{{ alertasImportantes().length }}</span>
-      </div>
-      <div class="alerts-list">
-        @for (alerta of alertasImportantes(); track alerta.titulo) {
-          <div 
-            [class]="'alert-item ' + alerta.tipo"
-            (click)="procesarAlerta(alerta)"
-            [attr.role]="'button'"
-            [attr.tabindex]="0">
-            <div class="alert-icon">
-              <i 
-                class="fas"
-                [class.fa-exclamation-circle]="alerta.tipo === 'urgent'"
-                [class.fa-exclamation-triangle]="alerta.tipo === 'warning'"
-                [class.fa-info-circle]="alerta.tipo === 'info'"></i>
-            </div>
-            <div class="alert-content">
-              <h4>{{ alerta.titulo }}</h4>
-              <p>{{ alerta.mensaje }}</p>
-              <button 
-                class="alert-action"
-                type="button"
-                [attr.aria-label]="'Ejecutar acción: ' + alerta.accion">
-                {{ alerta.accion }}
-              </button>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Actividad Reciente -->
-    <div class="card">
-      <div class="card-header">
-        <h3>
-          <i class="fas fa-history"></i>
-          Actividad Reciente
-        </h3>
-        <button 
-          class="view-all-btn"
-          type="button"
-          [attr.aria-label]="'Ver todas las actividades'">
-          Ver todo
-        </button>
-      </div>
-      <div class="activity-list">
-        @for (actividad of actividadesRecientes(); track actividad.id) {
-          <div [class]="'activity-item ' + actividad.estado">
-            
-            <div class="activity-icon">
-              <i 
-                class="fas"
-                [class.fa-user-check]="actividad.icono === 'user-check'"
-                [class.fa-file-alt]="actividad.icono === 'file-text'"
-                [class.fa-exclamation-circle]="actividad.icono === 'alert-circle'"
-                [class.fa-dollar-sign]="actividad.icono === 'dollar-sign'"
-                [class.fa-user-plus]="actividad.icono === 'user-plus'"></i>
-            </div>
-            
-            <div class="activity-content">
-              <p>{{ actividad.mensaje }}</p>
-              <span class="activity-time">
-                <i class="fas fa-clock"></i>
-                {{ actividad.hora }}
-              </span>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Distribución por Sectores -->
-    <div class="card">
-      <div class="card-header">
-        <h3>
-          <i class="fas fa-chart-pie"></i>
-          Distribución por Sectores
-        </h3>
-      </div>
-      <div class="sectors-distribution">
-        @for (sector of distribucionSectores(); track sector.sector) {
-          <div class="sector-item">
-            <div class="sector-info">
-              <h4>{{ sector.sector }}</h4>
-              <p>{{ sector.activos }}/{{ sector.empleados }} empleados</p>
-            </div>
-            <div class="sector-progress">
-              <div 
-                class="progress-bar"
-                [attr.role]="'progressbar'"
-                [attr.aria-valuenow]="sector.porcentaje"
-                [attr.aria-valuemin]="0"
-                [attr.aria-valuemax]="100"
-                [attr.aria-label]="'Progreso del sector ' + sector.sector">
-                <div 
-                  class="progress-fill" 
-                  [style.width.%]="sector.porcentaje"
-                  [style]="{ 
-                    'background': 'linear-gradient(90deg, var(--primary-color), var(--accent-color))' 
-                  }">
-                </div>
-              </div>
-              <span class="sector-percentage">{{ sector.porcentaje }}%</span>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- Métricas Adicionales -->
-<div class="bottom-metrics">
-  <div class="metric-item">
-    <i class="fas fa-calculator"></i>
-    <div>
-      <h4>{{ stats().horasTrabajadasMes | number:'1.0-0' }}</h4>
-      <p>Horas trabajadas este mes</p>
-    </div>
-  </div>
-  
-  <div class="metric-item">
-    <i class="fas fa-chart-line"></i>
-    <div>
-      <h4>{{ stats().promedioHorasDiarias | number:'1.1-1' }}</h4>
-      <p>Promedio horas/día</p>
-    </div>
-  </div>
-  
-  <div class="metric-item">
-    <i class="fas fa-percentage"></i>
-    <div>
-      <h4>{{ eficienciaGeneral() | number:'1.1-1' }}%</h4>
-      <p>Eficiencia general</p>
-    </div>
-  </div>
-  
-  <div class="metric-item">
-    <i class="fas fa-money-bill-wave"></i>
-    <div>
-      <h4>{{ stats().gastosPersonal | currency:'PEN':'symbol':'1.2-2' }}</h4>
-      <p>Gastos en personal</p>
-    </div>
   </div>
 </div>
