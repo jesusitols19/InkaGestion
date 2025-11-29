@@ -1,4 +1,3 @@
-
 /* ===== RESET Y BASE ===== */
 * {
     margin: 0;
@@ -16,7 +15,7 @@ body {
 
 
 .tituloI {
-    font-family: 'Roboto', sans-serif;  
+    font-family: 'Roboto', sans-serif;
     padding: 0;
     color: var(--white);
     background: none;
@@ -50,7 +49,8 @@ body {
     flex-wrap: wrap;
 }
 
-.btn-refresh, .btn-export {
+.btn-refresh,
+.btn-export {
     background: var(--visible-background);
     color: var(--white);
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -69,7 +69,8 @@ body {
     letter-spacing: 0.5px;
 }
 
-.btn-refresh:hover, .btn-export:hover {
+.btn-refresh:hover,
+.btn-export:hover {
     background: rgba(255, 255, 255, 0.25);
     border-color: rgba(255, 255, 255, 0.6);
     transform: translateY(-2px);
@@ -474,7 +475,8 @@ body {
     border-top: 1px solid #e8f5e8;
 }
 
-.hours, .entry-time {
+.hours,
+.entry-time {
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--dark-color);
@@ -783,7 +785,7 @@ body {
     .dashboard-content {
         grid-template-columns: 1fr;
     }
-    
+
     .right-column {
         order: -1;
     }
@@ -794,27 +796,27 @@ body {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .tituloI {
         font-size: 1.8rem;
     }
-    
+
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .field-workers {
         grid-template-columns: 1fr;
     }
-    
+
     .bottom-metrics {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .weekly-chart {
         gap: 0.4rem;
     }
-    
+
     .day-label {
         font-size: 0.8rem;
     }
@@ -824,21 +826,23 @@ body {
     .dashboard-header {
         padding: 1.5rem;
     }
-    
+
     .card-header {
         padding: 1rem;
     }
-    
-    .chart-container, .field-workers, .sectors-distribution {
+
+    .chart-container,
+    .field-workers,
+    .sectors-distribution {
         padding: 1rem;
     }
-    
+
     .stat-card {
         padding: 1.5rem;
         flex-direction: column;
         text-align: center;
     }
-    
+
     .bottom-metrics {
         grid-template-columns: 1fr;
     }
@@ -850,6 +854,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -857,9 +862,12 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.05);
     }
@@ -869,10 +877,21 @@ body {
     animation: fadeInUp 0.6s ease-out;
 }
 
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stat-card:nth-child(4) { animation-delay: 0.4s; }
+.stat-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.stat-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
 
 .alert-item.urgent .alert-icon {
     animation: pulse 2s infinite;
@@ -924,8 +943,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ===== TOOLTIPS ===== */
@@ -984,6 +1008,7 @@ body {
     0% {
         background-position: -200% 0;
     }
+
     100% {
         background-position: 200% 0;
     }
@@ -997,34 +1022,34 @@ body {
         --dark-color: #ffffff;
         --cancel-color: #404040;
     }
-    
+
     .card {
         background: var(--white);
         border-color: rgba(15, 153, 128, 0.2);
     }
-    
+
     .stat-card {
         background: var(--white);
         border-color: rgba(15, 153, 128, 0.2);
     }
-    
+
     .worker-card {
         background: var(--primary-main);
         border-color: rgba(15, 153, 128, 0.3);
     }
-    
+
     .activity-item:hover {
         background: var(--primary-main);
     }
-    
+
     .alert-item.urgent {
         background: rgba(244, 67, 54, 0.1);
     }
-    
+
     .alert-item.warning {
         background: rgba(249, 168, 37, 0.1);
     }
-    
+
     .alert-item.info {
         background: rgba(33, 150, 243, 0.1);
     }
@@ -1061,6 +1086,7 @@ button:focus,
 
 /* ===== PRINT STYLES ===== */
 @media print {
+
     .dashboard-header,
     .header-actions,
     .btn-refresh,
@@ -1069,21 +1095,21 @@ button:focus,
     .alert-action {
         display: none !important;
     }
-    
+
     .card {
         box-shadow: none;
         border: 1px solid #ddd;
         break-inside: avoid;
     }
-    
+
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .dashboard-content {
         grid-template-columns: 1fr;
     }
-    
+
     * {
         background: white !important;
         color: black !important;
@@ -1093,8 +1119,113 @@ button:focus,
 
 
 @media (min-width: 1200px) {
-  .stats-grid {
-    /* Mostramos las 4 columnas */
-    grid-template-columns: repeat(4, 1fr);
-  }
+    .stats-grid {
+        /* Mostramos las 4 columnas */
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+
+.filters-card {
+    overflow: visible;
+    /* Importante para que los dropdowns no se corten */
+    margin-bottom: 2rem;
+}
+
+.filters-card .card-body {
+    padding: 1.5rem 2rem;
+}
+
+.filters-form {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    /* Grilla de 12 columnas */
+    gap: 1.5rem;
+    align-items: center;
+    /* Alinea verticalmente los items */
+}
+
+/* Items del formulario */
+.filter-item {
+    grid-column: span 3;
+    /* Por defecto ocupa 3 columnas (aprox 25%) */
+}
+
+/* El selector de fechas suele necesitar más espacio */
+.filter-item.date-range {
+    grid-column: span 4;
+}
+
+/* Contenedor de botones */
+.actions-container {
+    grid-column: span 2;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    height: 56px;
+    /* Altura estándar de los inputs de Material */
+    align-items: center;
+}
+
+/* Ajustes visuales para Angular Material */
+mat-form-field {
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+/* Botones de acción */
+.btn-action {
+    height: 45px !important;
+    /* Un poco más altos para fácil click */
+    border-radius: 8px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.btn-action i {
+    margin-right: 0.5rem;
+}
+
+/* ===== RESPONSIVE PARA FILTROS ===== */
+
+/* Tablets (menos de 1024px) */
+@media (max-width: 1024px) {
+    .filter-item {
+        grid-column: span 6;
+        /* 2 items por fila */
+    }
+
+    .filter-item.date-range {
+        grid-column: span 6;
+    }
+
+    .actions-container {
+        grid-column: span 12;
+        /* Botones en fila completa */
+        justify-content: flex-end;
+    }
+}
+
+/* Móviles (menos de 600px) */
+@media (max-width: 600px) {
+    .filters-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .filter-item,
+    .actions-container {
+        width: 100%;
+    }
+
+    .actions-container {
+        justify-content: stretch;
+    }
+
+    .btn-action {
+        flex: 1;
+        /* Botones ocupan mitad y mitad */
+    }
 }

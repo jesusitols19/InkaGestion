@@ -1,41 +1,50 @@
-<div class="mb-6 rounded-lg bg-white p-5 shadow-sm border border-gray-100">
-  <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-      <i class="fas fa-filter text-primary-600"></i> Filtros de Inteligencia de Negocios
-    </h2>
+<!-- Sección de Filtros -->
+<div class="card filters-card">
+  <div class="card-header">
+    <h3>
+      <i class="fas fa-filter"></i>
+      Filtros de Inteligencia de Negocios
+    </h3>
   </div>
 
-  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 gap-4 md:grid-cols-5 md:items-end">
-    <!-- Tus filtros existentes (sin cambios mayores) -->
-    <mat-form-field appearance="outline" class="md:col-span-2 density-compact">
-      <mat-label>Periodo de Análisis</mat-label>
-      <mat-date-range-input [rangePicker]="picker">
-        <input matStartDate formControlName="startDate" placeholder="Inicio">
-        <input matEndDate formControlName="endDate" placeholder="Fin">
-      </mat-date-range-input>
-      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-date-range-picker #picker></mat-date-range-picker>
-    </mat-form-field>
+  <div class="card-body">
+    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="filters-form">
 
-    <mat-form-field appearance="outline" class="density-compact">
-      <mat-label>Área Operativa</mat-label>
-      <mat-select formControlName="areaId">
-        <mat-option [value]="null">Todas</mat-option>
-        @for (area of areas(); track area.id) {
-        <mat-option [value]="area.id">{{ area.name }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+      <!-- Rango de Fechas -->
+      <mat-form-field appearance="fill" class="filter-item date-range">
+        <mat-label>Periodo de Análisis</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate formControlName="startDate" placeholder="Inicio">
+          <input matEndDate formControlName="endDate" placeholder="Fin">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
 
-    <div class="flex gap-2">
-      <button mat-raised-button color="primary" type="submit" class="w-full">
-        Aplicar
-      </button>
-      <button mat-stroked-button type="button" (click)="clearFilters()">
-        Limpiar
-      </button>
-    </div>
-  </form>
+      <!-- Selector de Área -->
+      <mat-form-field appearance="fill" class="filter-item">
+        <mat-label>Área Operativa</mat-label>
+        <mat-select formControlName="areaId">
+          <mat-option [value]="null">Todas las Áreas</mat-option>
+          @for (area of areas(); track area.id) {
+          <mat-option [value]="area.id">{{ area.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+
+      <!-- Botones de Acción -->
+      <div class="actions-container">
+        <button mat-raised-button color="primary" type="submit" class="btn-action">
+          <i class="fas fa-check"></i> Aplicar
+        </button>
+        <button mat-stroked-button type="button" (click)="clearFilters()" class="btn-action">
+          <i class="fas fa-undo"></i> Limpiar
+        </button>
+      </div>
+
+    </form>
+  </div>
 </div>
 
 <!-- KPI CARDS (Datos Reales del Backend) -->
