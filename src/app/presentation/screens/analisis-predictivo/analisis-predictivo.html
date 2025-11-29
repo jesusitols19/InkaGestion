@@ -39,10 +39,11 @@
         </div>
       </mat-card-header>
       <mat-card-content>
+        @if (!loading) {
         <div class="chart-container">
-          <!-- Aquí se renderiza el gráfico -->
-          <canvas id="chartPrediccion"></canvas>
+          <canvas #chartPrediccion id="chartPrediccion"></canvas>
         </div>
+        }
       </mat-card-content>
     </mat-card>
 

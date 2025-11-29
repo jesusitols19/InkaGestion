@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { environment } from '../../../../environments/environments';
+import { forkJoin } from 'rxjs'; // <--- IMPORTANTE
 
 // --- LIBRERÍAS PDF ---
 import jsPDF from 'jspdf';
@@ -13,7 +14,7 @@ import autoTable from 'jspdf-autotable';
 // --- CHART.JS ---
 import Chart from 'chart.js/auto';
 
-// --- INTERFACES ---
+// --- INTERFACES (Las mantengo igual) ---
 interface MetricasValidacion {
   r2_score: number;
   interpretacion_r2: string;
@@ -31,7 +32,7 @@ interface ResponseCostos {
   metricas_validacion: MetricasValidacion;
   variables_usadas: string[];
   datos_historicos_usados: number;
-  datos_grafico: DatosGrafico; // <--- Nuevo campo del backend
+  datos_grafico: DatosGrafico;
 }
 
 interface Patron {
@@ -84,7 +85,11 @@ interface ApiResponse<T> {
 export class AnalisisPredictivo implements OnInit, OnDestroy {
 
   private http = inject(HttpClient);
-  private apiUrl = environment.apiUrl + '/api/v1/ia'; // Verifica si tu ruta incluye /api/v1
+  private cdr = inject(ChangeDetectorRef); // <--- Para forzar renderizado
+  private apiUrl = environment.apiUrl + '/api/v1/ia';
+
+  // Acceso directo al Canvas desde Angular (Más seguro que getElementById)
+  @ViewChild('chartPrediccion') chartCanvas!: ElementRef<HTMLCanvasElement>;
 
   // Estado de Datos
   public dataCostos: ResponseCostos | null = null;
@@ -94,7 +99,6 @@ export class AnalisisPredictivo implements OnInit, OnDestroy {
   public loading: boolean = true;
   public isGenerandoPDF: boolean = false;
 
-  // Referencia al gráfico para poder destruirlo antes de redibujar
   private chartInstance: Chart | null = null;
 
   ngOnInit(): void {
@@ -102,7 +106,6 @@ export class AnalisisPredictivo implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Limpieza de memoria al salir de la pantalla
     if (this.chartInstance) {
       this.chartInstance.destroy();
     }
@@ -111,81 +114,73 @@ export class AnalisisPredictivo implements OnInit, OnDestroy {
   cargarDatosIA() {
     this.loading = true;
 
-    // 1. Cargar Predicción de Costos
-    this.http.get<ApiResponse<ResponseCostos>>(`${this.apiUrl}/predecir-costos-planilla`)
-      .subscribe({
-        next: (res) => {
-          this.dataCostos = res.data;
-          console.log(this.dataCostos);
-          setTimeout(() => {
-            this.renderizarGrafico(this.dataCostos?.datos_grafico);
-          }, 100);
-        },
-        error: (err) => console.error('Error costos:', err)
-      });
+    // Usamos forkJoin para hacer las 3 peticiones en paralelo y esperar a todas
+    forkJoin({
+      costos: this.http.get<ApiResponse<ResponseCostos>>(`${this.apiUrl}/predecir-costos-planilla`),
+      patrones: this.http.get<ApiResponse<ResponsePatrones>>(`${this.apiUrl}/patrones-adelantos`),
+      anomalias: this.http.get<ApiResponse<ResponseAnomalias>>(`${this.apiUrl}/detectar-anomalias-asistencia`)
+    }).subscribe({
+      next: (results) => {
+        // 1. Asignamos todos los datos
+        this.dataCostos = results.costos.data;
+        this.dataPatrones = results.patrones.data;
+        this.dataAnomalias = results.anomalias.data;
 
+        // 2. Apagamos el loading
+        this.loading = false;
 
-    // 2. Cargar Patrones de Adelantos
-    this.http.get<ApiResponse<ResponsePatrones>>(`${this.apiUrl}/patrones-adelantos`)
-      .subscribe({
-        next: (res) => {
-          this.dataPatrones = res.data;
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Error patrones:', err);
-          this.loading = false;
+        // 3. Forzamos a Angular a detectar cambios para que el <canvas> aparezca en el DOM
+        this.cdr.detectChanges();
+
+        // 4. Renderizamos sin delays artificiales
+        if (this.dataCostos?.datos_grafico) {
+          this.renderizarGrafico(this.dataCostos.datos_grafico);
         }
-      });
-
-    // 3. Cargar Anomalías
-    this.http.get<ApiResponse<ResponseAnomalias>>(`${this.apiUrl}/detectar-anomalias-asistencia`)
-      .subscribe({
-        next: (res) => this.dataAnomalias = res.data,
-        error: (err) => console.error('Error anomalías:', err)
-      });
+      },
+      error: (err) => {
+        console.error('Error cargando datos de IA:', err);
+        this.loading = false;
+      }
+    });
   }
 
-  renderizarGrafico(datos?: DatosGrafico) {
-    if (!datos) return;
+  renderizarGrafico(datos: DatosGrafico) {
+    // Verificación de seguridad usando ViewChild
+    if (!this.chartCanvas?.nativeElement) return;
 
-    const canvas = document.getElementById('chartPrediccion') as HTMLCanvasElement;
-    if (!canvas) return;
+    const ctx = this.chartCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
 
-    // Si ya existe un gráfico previo, lo destruimos para evitar superposiciones
     if (this.chartInstance) {
       this.chartInstance.destroy();
     }
 
-    this.chartInstance = new Chart(canvas, {
+    this.chartInstance = new Chart(ctx, {
       type: 'line',
       data: {
         labels: datos.labels,
         datasets: [{
           label: 'Costo de Planilla (S/)',
           data: datos.valores,
-          borderColor: 'rgb(15, 153, 128)', // Color Primario Inka
-          backgroundColor: 'rgba(15, 153, 128, 0.1)', // Fondo suave
+          borderColor: 'rgb(15, 153, 128)',
+          backgroundColor: 'rgba(15, 153, 128, 0.1)',
           borderWidth: 3,
           pointBackgroundColor: 'rgb(255, 255, 255)',
           pointBorderColor: 'rgb(15, 153, 128)',
           pointRadius: 5,
           pointHoverRadius: 8,
-          tension: 0.3, // Curva suave
+          tension: 0.3,
           fill: true,
-          // Configuración avanzada de segmentos para la predicción
           segment: {
             borderColor: (ctx) => {
-              // Pinta de naranja el último segmento (la predicción)
               if (ctx.p1DataIndex === datos.valores.length - 1) {
-                return 'rgb(251, 192, 45)'; // Color Secundario/Alerta
+                return 'rgb(251, 192, 45)'; // Naranja para predicción
               }
-              return 'rgb(15, 153, 128)'; // Color normal
+              return 'rgb(15, 153, 128)';
             },
             borderDash: (ctx) => {
-              // Hace punteada la línea del último segmento
               if (ctx.p1DataIndex === datos.valores.length - 1) {
-                return [6, 6];
+                return [6, 6]; // Línea punteada para predicción
               }
               return undefined;
             }
@@ -195,22 +190,19 @@ export class AnalisisPredictivo implements OnInit, OnDestroy {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: {
+          duration: 800 // Animación un poco más rápida (default es 1000)
+        },
         plugins: {
-          legend: {
-            display: true,
-            position: 'top'
-          },
+          legend: { display: true, position: 'top' },
           tooltip: {
             callbacks: {
               label: function (context) {
                 let label = context.dataset.label || '';
-                if (label) {
-                  label += ': ';
-                }
+                if (label) label += ': ';
                 if (context.parsed.y !== null) {
                   label += new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(context.parsed.y);
                 }
-                // Añadir nota si es el punto de predicción
                 if (context.dataIndex === context.dataset.data.length - 1) {
                   label += ' (Proyección IA)';
                 }
@@ -220,17 +212,8 @@ export class AnalisisPredictivo implements OnInit, OnDestroy {
           }
         },
         scales: {
-          y: {
-            beginAtZero: false, // Empezar dinámicamente para ver mejor la variación
-            grid: {
-              color: 'rgba(0,0,0,0.05)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
+          y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.05)' } },
+          x: { grid: { display: false } }
         }
       }
     });
@@ -240,6 +223,7 @@ export class AnalisisPredictivo implements OnInit, OnDestroy {
     window.open(`${this.apiUrl}/exportar-predicciones-excel`, '_blank');
   }
 
+  // ... (El método exportarPDF queda igual que en tu código original)
   exportarPDF() {
     if (!this.dataCostos || !this.dataPatrones) {
       alert('Los datos aún se están procesando. Intente en unos segundos.');
